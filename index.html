@@ -514,23 +514,16 @@ const LIBROS_DEFAULT = [
 
 const STORAGE_KEY = 'tracker_valentina_v1';
 
-let state = cargarEstado();
+let state = {
+  dias: {},
+  semanas: {},
+  certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
+  repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
+  libros: LIBROS_DEFAULT.map(l => ({ ...l, started: false, finished: false, finishedDate: null })),
+  idiomas: { ingles: 'B2', frances: 'A0', ielts: '', tef: '' }
+};
 
-function cargarEstado() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const s = JSON.parse(raw);
-      // Asegurar arrays/objetos
-      s.dias = s.dias || {};
-      s.semanas = s.semanas || {};
-      s.certs = s.certs || JSON.parse(JSON.stringify(CERTS_DEFAULT)).map(c => ({ ...c, done: false, doneDate: null, certUrl: '' }));
-      s.repos = s.repos || JSON.parse(JSON.stringify(REPOS_DEFAULT)).map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' }));
-      s.libros = s.libros || JSON.parse(JSON.stringify(LIBROS_DEFAULT)).map(l => ({ ...l, started: false, finished: false, finishedDate: null }));
-      s.idiomas = s.idiomas || { ingles: 'B2', frances: 'A0', ielts: '', tef: '' };
-      return s;
-    }
-  } catch(e) { console.error('Error cargando estado', e); }
+function defaultState() {
   return {
     dias: {},
     semanas: {},
@@ -541,9 +534,38 @@ function cargarEstado() {
   };
 }
 
-function guardar() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  actualizarStorageInfo();
+async function cargarEstado() {
+  try {
+    const res = await fetch('/api/state');
+    if (res.ok) {
+      const s = await res.json();
+      if (s && Object.keys(s).length > 0) {
+        // Asegurar arrays/objetos
+        s.dias = s.dias || {};
+        s.semanas = s.semanas || {};
+        s.certs = s.certs || state.certs;
+        s.repos = s.repos || state.repos;
+        s.libros = s.libros || state.libros;
+        s.idiomas = s.idiomas || state.idiomas;
+        state = s;
+      }
+    }
+  } catch(e) { console.error('Error cargando estado desde API', e); }
+}
+
+async function guardar() {
+  try {
+    const res = await fetch('/api/state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) throw new Error("Error en servidor");
+    actualizarStorageInfo();
+  } catch(e) {
+    console.error(e);
+    toast('Error al guardar en la nube', false);
+  }
 }
 
 function toast(msg, success = true) {
@@ -928,9 +950,10 @@ function importarJSON(e) {
       const imported = JSON.parse(ev.target.result);
       if (!confirm('¿Reemplazar TODOS los datos actuales con el respaldo? (Recomendado: exportar primero el actual)')) return;
       state = imported;
-      guardar();
-      cargarHoy(); cargarSemana(); renderHitos();
-      toast('Respaldo importado');
+      guardar().then(() => {
+        cargarHoy(); cargarSemana(); renderHitos();
+        toast('Respaldo importado y guardado en la nube');
+      });
     } catch(err) { toast('Error: archivo inválido', false); }
   };
   reader.readAsText(file);
@@ -939,11 +962,11 @@ function importarJSON(e) {
 function resetearTodo() {
   if (!confirm('⚠️ ESTO BORRA TODOS LOS DATOS. ¿Estás 100% segura?')) return;
   if (!confirm('Última oportunidad. ¿Continuar con el reseteo?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  state = cargarEstado();
-  guardar();
-  cargarHoy(); cargarSemana(); renderHitos();
-  toast('Datos reseteados', false);
+  state = defaultState();
+  guardar().then(() => {
+    cargarHoy(); cargarSemana(); renderHitos();
+    toast('Datos reseteados', false);
+  });
 }
 
 function actualizarStorageInfo() {
@@ -1248,11 +1271,16 @@ document.getElementById('reporte-semana-inicio').addEventListener('change', e =>
   document.getElementById('reporte-semana-rango').textContent = 'Semana ajustada: ' + semanaLabel(lunes);
 });
 
-cargarHoy();
-cargarSemana();
-renderHitos();
-renderResumen7Dias();
-actualizarStorageInfo();
+async function initApp() {
+  await cargarEstado();
+  cargarHoy();
+  cargarSemana();
+  renderHitos();
+  renderResumen7Dias();
+  actualizarStorageInfo();
+}
+
+initApp();
 </script>
 
 </body>
