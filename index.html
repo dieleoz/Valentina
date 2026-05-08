@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tracker Valentina HZ · Career Architect</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: #F5F5F5;
+    color: #1A1A1A;
+    line-height: 1.5;
+    font-size: 15px;
+  }
+  header {
+    background: #1F4E79;
+    color: white;
+    padding: 18px 24px;
+    border-bottom: 4px solid #C5504B;
+  }
+  header h1 { font-size: 20px; margin-bottom: 4px; }
+  header .sub { font-size: 13px; opacity: 0.85; font-style: italic; }
+  nav.tabs {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #DDD;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  nav.tabs button {
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #595959;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  nav.tabs button:hover { background: #F2F2F2; }
+  nav.tabs button.active {
+    color: #1F4E79;
+    border-bottom-color: #C5504B;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  section.tab-content { display: none; }
+  section.tab-content.active { display: block; }
+  h2 {
+    font-size: 18px; color: #1F4E79; margin-bottom: 12px;
+    padding-bottom: 6px; border-bottom: 2px solid #D9E2F3;
+  }
+  h3 { font-size: 15px; color: #C5504B; margin: 18px 0 10px 0; font-weight: 700; }
+  .card {
+    background: white;
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  label { font-size: 13px; font-weight: 600; color: #404040; display: block; margin-bottom: 4px; }
+  input[type="text"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #C0C0C0;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #1F4E79;
+    box-shadow: 0 0 0 2px rgba(31,78,121,0.15);
+  }
+  .block-row {
+    display: grid;
+    grid-template-columns: 24px 110px 70px 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #EEE;
+  }
+  .block-row .block-name { font-weight: 600; font-size: 13px; }
+  .block-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  .block-row input[type="number"] { padding: 6px; text-align: center; }
+  .block-row input[type="text"] { padding: 6px 8px; font-size: 13px; }
+  button.btn {
+    padding: 10px 18px;
+    background: #1F4E79;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 8px;
+    margin-top: 4px;
+  }
+  button.btn:hover { background: #16385A; }
+  button.btn.secondary { background: #595959; }
+  button.btn.secondary:hover { background: #404040; }
+  button.btn.danger { background: #C5504B; }
+  button.btn.danger:hover { background: #A03E3A; }
+  button.btn.success { background: #385723; }
+  button.btn.success:hover { background: #2A4019; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 720px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .block-row { grid-template-columns: 24px 1fr; }
+    .block-row .hours-cell, .block-row .desc-cell { grid-column: 2; }
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table th, table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #DDD;
+  }
+  table th { background: #D9E2F3; color: #1F4E79; font-weight: 700; }
+  .kpi-card {
+    background: white;
+    padding: 12px 14px;
+    border-left: 4px solid #1F4E79;
+    border-radius: 4px;
+  }
+  .kpi-card .label { font-size: 11px; text-transform: uppercase; color: #595959; letter-spacing: 0.5px; }
+  .kpi-card .value { font-size: 24px; font-weight: 700; color: #1F4E79; margin-top: 2px; }
+  .kpi-card .target { font-size: 11px; color: #999; margin-top: 2px; }
+  .kpi-card.success { border-left-color: #385723; }
+  .kpi-card.success .value { color: #385723; }
+  .kpi-card.warn { border-left-color: #C5504B; }
+  .kpi-card.warn .value { color: #C5504B; }
+  .milestone-item {
+    display: grid;
+    grid-template-columns: 22px 1fr 100px 80px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #EEE;
+    font-size: 13px;
+  }
+  .milestone-item.done .name { text-decoration: line-through; color: #888; }
+  .milestone-item input[type="text"] { padding: 5px 7px; font-size: 12px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-blue { background: #D9E2F3; color: #1F4E79; }
+  .badge-orange { background: #FCE4D6; color: #C5504B; }
+  .badge-green { background: #D5E8C8; color: #385723; }
+  .small { font-size: 12px; color: #666; }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #385723;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .add-row { display: flex; gap: 6px; align-items: stretch; margin-top: 8px; }
+  .add-row input { flex: 1; }
+  .danger-link {
+    background: none; border: none; color: #C5504B;
+    cursor: pointer; font-size: 12px; padding: 2px 6px;
+  }
+  .info-box {
+    background: #FFF8E7;
+    border-left: 4px solid #E2A93B;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .links-list { font-size: 12px; }
+  .links-list a { color: #1F4E79; }
+  .week-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .week-nav button { padding: 6px 10px; }
+  .completed-line { background: #E8F5E9; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Tracker de Ejecución · Valentina HZ</h1>
+  <div class="sub">Career Architect · Método Grit-Mindset-Carlos-Style · v1.0</div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="hoy" class="active">Hoy</button>
+  <button data-tab="semana">Semana</button>
+  <button data-tab="hitos">Hitos</button>
+  <button data-tab="reporte">Reporte PDF</button>
+  <button data-tab="datos">Datos</button>
+</nav>
+
+<main>
+
+<!-- ============= TAB HOY ============= -->
+<section id="tab-hoy" class="tab-content active">
+  <div class="card">
+    <h2>Registro Diario</h2>
+    <div class="row">
+      <div style="flex: 1; min-width: 180px;">
+        <label>Fecha</label>
+        <input type="date" id="hoy-fecha">
+      </div>
+      <div style="margin-top: 18px;">
+        <button class="btn secondary" onclick="cargarDiaAyer()">← Día anterior</button>
+        <button class="btn secondary" onclick="cargarHoy()">Hoy</button>
+      </div>
+    </div>
+
+    <h3>Los 6 bloques de hoy</h3>
+    <div class="info-box">Marca solo lo que ya hiciste. Las horas son reales, no aspiracionales. La columna "qué hice" debe ser concreta — "Kaggle Pandas módulo 3" no "estudié Python".</div>
+
+    <div id="bloques-container"></div>
+
+    <h3>Reflexión del día</h3>
+    <div class="grid-2">
+      <div>
+        <label>🏆 Wins (qué salió bien)</label>
+        <textarea id="hoy-wins" placeholder="Ej: Primer correo de respuesta de un reclutador. Terminé módulo X."></textarea>
+      </div>
+      <div>
+        <label>🚧 Blockers (qué se atascó)</label>
+        <textarea id="hoy-blockers" placeholder="Ej: No pude terminar el repo porque..."></textarea>
+      </div>
+    </div>
+
+    <div style="margin-top: 14px;">
+      <button class="btn success" onclick="guardarDia()">💾 Guardar día</button>
+      <button class="btn danger" onclick="borrarDia()">Borrar este día</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Resumen de los últimos 7 días</h2>
+    <div id="resumen-7dias"></div>
+  </div>
+</section>
+
+<!-- ============= TAB SEMANA ============= -->
+<section id="tab-semana" class="tab-content">
+  <div class="card">
+    <h2>KPIs de la semana</h2>
+    <div class="week-nav">
+      <button class="btn secondary" onclick="cambiarSemana(-1)">←</button>
+      <strong id="semana-label">Semana actual</strong>
+      <button class="btn secondary" onclick="cambiarSemana(1)">→</button>
+      <button class="btn secondary" onclick="cambiarSemana(0)">Esta semana</button>
+    </div>
+
+    <div class="info-box">Las metas mostradas son las del Plan Maestro. Verde = al o arriba del objetivo. Naranja = abajo del objetivo. Sé honesta con los números — el coach va a ver el reporte.</div>
+
+    <h3>Empleabilidad</h3>
+    <div class="grid-3">
+      <div>
+        <label>Postulaciones formales</label>
+        <input type="number" id="kpi-postulaciones" min="0" onchange="guardarSemana()">
+        <div class="small">Meta mes 1: 5/sem · Mes 6: 8/sem</div>
+      </div>
+      <div>
+        <label>Entrevistas conseguidas</label>
+        <input type="number" id="kpi-entrevistas" min="0" onchange="guardarSemana()">
+        <div class="small">Meta mes 1: 1/mes · Mes 6: 3/mes</div>
+      </div>
+      <div>
+        <label>Conexiones LinkedIn nuevas</label>
+        <input type="number" id="kpi-conexiones" min="0" onchange="guardarSemana()">
+        <div class="small">Meta: 10-15/sem (recruiters CA/US/UK)</div>
+      </div>
+    </div>
+
+    <h3>Freelance + ingresos</h3>
+    <div class="grid-3">
+      <div>
+        <label>Ingreso freelance USD esta semana</label>
+        <input type="number" id="kpi-freelance" min="0" step="0.01" onchange="guardarSemana()">
+        <div class="small">Meta mes 1: $50/sem · Mes 3: $200/sem · Mes 6: $400/sem</div>
+      </div>
+      <div>
+        <label>Proyectos freelance entregados</label>
+        <input type="number" id="kpi-proyectos" min="0" onchange="guardarSemana()">
+        <div class="small">Meta: 1-3/sem</div>
+      </div>
+      <div>
+        <label>Tarifa USD/hr efectiva actual</label>
+        <input type="number" id="kpi-tarifa" min="0" step="0.5" onchange="guardarSemana()">
+        <div class="small">Mes 1: $5-8 · Mes 6: $15-25</div>
+      </div>
+    </div>
+
+    <h3>Visibilidad técnica</h3>
+    <div class="grid-3">
+      <div>
+        <label>Posts LinkedIn (en inglés)</label>
+        <input type="number" id="kpi-posts" min="0" onchange="guardarSemana()">
+        <div class="small">Meta: 2-3/sem</div>
+      </div>
+      <div>
+        <label>Commits en GitHub</label>
+        <input type="number" id="kpi-commits" min="0" onchange="guardarSemana()">
+        <div class="small">Meta: 5+/sem</div>
+      </div>
+      <div>
+        <label>Certificaciones publicadas</label>
+        <input type="number" id="kpi-certs" min="0" onchange="guardarSemana()">
+        <div class="small">Meta: 1 cada 2 sem</div>
+      </div>
+    </div>
+
+    <h3>Reflexión semanal</h3>
+    <div>
+      <label>📝 Logros y aprendizajes de la semana</label>
+      <textarea id="kpi-reflexion" placeholder="¿Qué cambió en mi perfil esta semana? ¿Qué descubrí?"></textarea>
+    </div>
+    <div style="margin-top:10px;">
+      <label>🤔 Preguntas para el coach</label>
+      <textarea id="kpi-preguntas" placeholder="Ej: ¿Vale la pena pagar curso AMWA ya o esperar mes 6? ¿Mi tarifa USD/hr está bien para subir?"></textarea>
+    </div>
+    <div style="margin-top:10px;">
+      <label>📅 Plan para la próxima semana</label>
+      <textarea id="kpi-plan" placeholder="Las 3 cosas concretas que voy a ejecutar la próxima semana."></textarea>
+    </div>
+
+    <div style="margin-top:14px;">
+      <button class="btn success" onclick="guardarSemana(true)">💾 Guardar semana</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Tablero visual</h2>
+    <div id="kpi-board" class="grid-3"></div>
+  </div>
+</section>
+
+<!-- ============= TAB HITOS ============= -->
+<section id="tab-hitos" class="tab-content">
+  <div class="card">
+    <h2>📜 Certificaciones (precargadas del Plan Maestro)</h2>
+    <div class="info-box">Marca completada cuando subiste el certificado a LinkedIn. La URL es donde está el certificado público. Sin URL pública, no cuenta.</div>
+    <div id="lista-certs"></div>
+    <div class="add-row">
+      <input type="text" id="nueva-cert" placeholder="Nombre certificación adicional">
+      <button class="btn" onclick="agregarCert()">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>💻 Repositorios GitHub</h2>
+    <div class="info-box">Los 4 repos del Plan Maestro. Sin estos publicados, el camino AI-Bio no avanza.</div>
+    <div id="lista-repos"></div>
+    <div class="add-row">
+      <input type="text" id="nuevo-repo" placeholder="Nombre del nuevo repo">
+      <button class="btn" onclick="agregarRepo()">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🌐 Idiomas</h2>
+    <div class="grid-2">
+      <div>
+        <label>Inglés - Nivel actual autoevaluado</label>
+        <select id="ingles-nivel" onchange="guardarHitos()">
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="B2+">B2+</option>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+        </select>
+        <label style="margin-top:8px;">IELTS Score (si ya tomó examen)</label>
+        <input type="text" id="ielts" placeholder="Ej: 7.5 overall">
+      </div>
+      <div>
+        <label>Francés - Nivel actual</label>
+        <select id="frances-nivel" onchange="guardarHitos()">
+          <option value="A0">A0 (no iniciado)</option>
+          <option value="A1">A1</option>
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="C1">C1</option>
+        </select>
+        <label style="margin-top:8px;">TEF Canada Score (si ya tomó examen)</label>
+        <input type="text" id="tef" placeholder="Ej: NCLC 7">
+      </div>
+    </div>
+    <button class="btn success" onclick="guardarHitos()" style="margin-top: 10px;">💾 Guardar idiomas</button>
+  </div>
+
+  <div class="card">
+    <h2>📚 Libros del plan (de la guía de Career Architect)</h2>
+    <div id="lista-libros"></div>
+  </div>
+</section>
+
+<!-- ============= TAB REPORTE ============= -->
+<section id="tab-reporte" class="tab-content">
+  <div class="card">
+    <h2>Generar reporte PDF</h2>
+    <div class="info-box">El PDF generado incluye toda la actividad de la semana seleccionada + KPIs + hitos al día. Tiene una sección "REVISIÓN DEL COACH" en blanco para que un mentor o un asistente AI llene cuando le subas el archivo a un chat de revisión.</div>
+
+    <div class="grid-2">
+      <div>
+        <label>Semana del reporte</label>
+        <input type="date" id="reporte-semana-inicio">
+        <div class="small" id="reporte-semana-rango">Selecciona el lunes de la semana</div>
+      </div>
+      <div>
+        <label>Tu nombre (aparece en el header)</label>
+        <input type="text" id="reporte-nombre" value="Valentina Hernández Zavala">
+      </div>
+    </div>
+
+    <div style="margin-top: 14px;">
+      <button class="btn" onclick="generarPDF()">📄 Generar PDF reporte semanal</button>
+      <button class="btn secondary" onclick="generarPDFCompleto()">📊 Reporte completo (todos los hitos)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📋 Cómo usar el ciclo de revisión</h2>
+    <ol style="padding-left: 20px; line-height: 1.8;">
+      <li>Cada semana, el sábado, generas el PDF de la semana que termina.</li>
+      <li>Subes el PDF a un nuevo chat con tu coach (puede ser Claude o un mentor humano).</li>
+      <li>El coach lee el reporte y llena la sección "REVISIÓN DEL COACH" con feedback específico.</li>
+      <li>El lunes siguiente, ajustas el plan según lo recibido.</li>
+      <li>Vuelves a este tracker. Empiezas la nueva semana.</li>
+    </ol>
+    <p class="small" style="margin-top:12px;"><strong>Nota:</strong> Si el coach es Claude en otro chat, copia y pega el contenido del reporte como texto en el chat (o sube el PDF directamente). Pídele explícitamente que llene la sección de revisión usando el método Career Architect.</p>
+  </div>
+</section>
+
+<!-- ============= TAB DATOS ============= -->
+<section id="tab-datos" class="tab-content">
+  <div class="card">
+    <h2>Respaldo y restauración</h2>
+    <div class="info-box">Tus datos se guardan automáticamente en este navegador. Para tener un respaldo real "en disco", exporta el JSON cada semana y guárdalo en una carpeta de Drive/iCloud.</div>
+
+    <div style="margin-top: 14px;">
+      <button class="btn" onclick="exportarJSON()">📥 Exportar todos los datos (JSON)</button>
+      <button class="btn secondary" onclick="document.getElementById('importar-input').click()">📤 Importar respaldo (JSON)</button>
+      <input type="file" id="importar-input" accept=".json" style="display:none" onchange="importarJSON(event)">
+    </div>
+
+    <div style="margin-top: 24px;">
+      <button class="btn danger" onclick="resetearTodo()">⚠️ Resetear TODO (borra todos los datos)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Estado del almacenamiento</h2>
+    <div id="storage-info"></div>
+  </div>
+</section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ============= ESTADO Y BLOQUES =============
+
+const BLOQUES = [
+  { id: 'ingles',    nombre: 'Inglés',         meta: '1-1.5 hrs/día' },
+  { id: 'tech',      nombre: 'Tech Stack',     meta: '1-2 hrs/día (Python/R/SQL/ML)' },
+  { id: 'empleo',    nombre: 'Empleo formal',  meta: 'Jornada laboral MX' },
+  { id: 'certs',     nombre: 'Certificaciones', meta: '0.5-1 hr/día (HACCP/ISO/COFEPRIS)' },
+  { id: 'freelance', nombre: 'Freelance',      meta: '2 hrs/día (Upwork/Preply/Kolabtree)' },
+  { id: 'lectura',   nombre: 'Lectura libro',  meta: '30 min/día (los 5 del plan)' }
+];
+
+const CERTS_DEFAULT = [
+  { id: 'haccp', name: 'HACCP - Inocuidad alimentaria', target: 'Mes 1', url: 'https://alison.com' },
+  { id: 'senasica', name: 'SENASICA - Cursos inocuidad', target: 'Mes 1', url: 'https://www.gob.mx/senasica' },
+  { id: 'iso9001', name: 'ISO 9001:2015', target: 'Mes 1-2', url: 'https://www.coursera.org' },
+  { id: 'iso22000', name: 'ISO 22000 - Food Safety', target: 'Mes 2', url: 'https://alison.com' },
+  { id: 'excel', name: 'Excel intermedio', target: 'Mes 1', url: 'https://exceljet.net' },
+  { id: 'cofepris', name: 'COFEPRIS Farmacovigilancia', target: 'Mes 2', url: 'https://cursos.aprende.gob.mx' },
+  { id: 'gcp', name: 'GCP-NIDA (ICH-GCP)', target: 'Mes 3', url: 'https://gcp.nidatraining.org' },
+  { id: 'kaggle-py', name: 'Kaggle Python', target: 'Mes 2', url: 'https://www.kaggle.com/learn' },
+  { id: 'kaggle-pd', name: 'Kaggle Pandas', target: 'Mes 3', url: 'https://www.kaggle.com/learn' },
+  { id: 'stanford-sci', name: 'Stanford Writing in the Sciences', target: 'Mes 4', url: 'https://www.coursera.org/learn/sciwrite' }
+];
+
+const REPOS_DEFAULT = [
+  { id: 'r1', name: 'Re-análisis estadístico UNAM en Python', target: 'Mes 4-6' },
+  { id: 'r2', name: 'Clasificador ML supervivencia rotíferos', target: 'Mes 9-11' },
+  { id: 'r3', name: 'Análisis secuencias con Biopython', target: 'Mes 12-14' },
+  { id: 'r4', name: 'Predicción estructura proteínica ESMFold', target: 'Mes 18-22' }
+];
+
+const LIBROS_DEFAULT = [
+  { id: 'mindset',   name: 'Mindset · Carol Dweck',                         orden: 1 },
+  { id: 'grit',      name: 'Grit · Angela Duckworth',                        orden: 2 },
+  { id: 'crucial',   name: 'Crucial Conversations · Patterson et al.',       orden: 3 },
+  { id: 'voss',      name: 'Never Split the Difference · Chris Voss',        orden: 4 },
+  { id: 'atomic',    name: 'Atomic Habits · James Clear',                    orden: 5 }
+];
+
+const STORAGE_KEY = 'tracker_valentina_v1';
+
+let state = cargarEstado();
+
+function cargarEstado() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      // Asegurar arrays/objetos
+      s.dias = s.dias || {};
+      s.semanas = s.semanas || {};
+      s.certs = s.certs || JSON.parse(JSON.stringify(CERTS_DEFAULT)).map(c => ({ ...c, done: false, doneDate: null, certUrl: '' }));
+      s.repos = s.repos || JSON.parse(JSON.stringify(REPOS_DEFAULT)).map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' }));
+      s.libros = s.libros || JSON.parse(JSON.stringify(LIBROS_DEFAULT)).map(l => ({ ...l, started: false, finished: false, finishedDate: null }));
+      s.idiomas = s.idiomas || { ingles: 'B2', frances: 'A0', ielts: '', tef: '' };
+      return s;
+    }
+  } catch(e) { console.error('Error cargando estado', e); }
+  return {
+    dias: {},
+    semanas: {},
+    certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
+    repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
+    libros: LIBROS_DEFAULT.map(l => ({ ...l, started: false, finished: false, finishedDate: null })),
+    idiomas: { ingles: 'B2', frances: 'A0', ielts: '', tef: '' }
+  };
+}
+
+function guardar() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  actualizarStorageInfo();
+}
+
+function toast(msg, success = true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = success ? '#385723' : '#C5504B';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function fechaHoy() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+function lunesDeLaSemana(fecha) {
+  const d = new Date(fecha + 'T12:00:00');
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  d.setDate(d.getDate() - diff);
+  return d.toISOString().slice(0, 10);
+}
+
+function semanaLabel(lunes) {
+  const d = new Date(lunes + 'T12:00:00');
+  const finSemana = new Date(d);
+  finSemana.setDate(finSemana.getDate() + 6);
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }) + ' - ' +
+         finSemana.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ============= TABS =============
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('section.tab-content').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'semana') renderKpiBoard();
+    if (btn.dataset.tab === 'datos') actualizarStorageInfo();
+    if (btn.dataset.tab === 'hitos') renderHitos();
+    if (btn.dataset.tab === 'hoy') renderResumen7Dias();
+  });
+});
+
+// ============= TAB HOY =============
+function renderBloques(diaData) {
+  const c = document.getElementById('bloques-container');
+  c.innerHTML = '';
+  BLOQUES.forEach(b => {
+    const data = (diaData?.bloques?.[b.id]) || { done: false, hours: 0, what: '' };
+    const div = document.createElement('div');
+    div.className = 'block-row';
+    div.innerHTML = `
+      <input type="checkbox" data-bloque="${b.id}" data-field="done" ${data.done ? 'checked' : ''}>
+      <div class="block-name">${b.nombre}<div class="small" style="font-weight: 400;">${b.meta}</div></div>
+      <div class="hours-cell"><input type="number" min="0" step="0.25" data-bloque="${b.id}" data-field="hours" value="${data.hours}" placeholder="hrs"></div>
+      <div class="desc-cell"><input type="text" data-bloque="${b.id}" data-field="what" value="${(data.what||'').replace(/"/g,'&quot;')}" placeholder="¿Qué hice exactamente?"></div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function leerBloquesUI() {
+  const result = {};
+  BLOQUES.forEach(b => {
+    result[b.id] = {
+      done: document.querySelector(`[data-bloque="${b.id}"][data-field="done"]`).checked,
+      hours: parseFloat(document.querySelector(`[data-bloque="${b.id}"][data-field="hours"]`).value) || 0,
+      what:  document.querySelector(`[data-bloque="${b.id}"][data-field="what"]`).value
+    };
+  });
+  return result;
+}
+
+function cargarDia(fecha) {
+  document.getElementById('hoy-fecha').value = fecha;
+  const data = state.dias[fecha];
+  renderBloques(data);
+  document.getElementById('hoy-wins').value = data?.wins || '';
+  document.getElementById('hoy-blockers').value = data?.blockers || '';
+}
+
+function cargarHoy() { cargarDia(fechaHoy()); }
+function cargarDiaAyer() {
+  const f = document.getElementById('hoy-fecha').value || fechaHoy();
+  const d = new Date(f + 'T12:00:00');
+  d.setDate(d.getDate() - 1);
+  cargarDia(d.toISOString().slice(0, 10));
+}
+
+document.getElementById('hoy-fecha').addEventListener('change', e => cargarDia(e.target.value));
+
+function guardarDia() {
+  const fecha = document.getElementById('hoy-fecha').value;
+  if (!fecha) { toast('Selecciona una fecha', false); return; }
+  state.dias[fecha] = {
+    bloques: leerBloquesUI(),
+    wins: document.getElementById('hoy-wins').value,
+    blockers: document.getElementById('hoy-blockers').value,
+    savedAt: new Date().toISOString()
+  };
+  guardar();
+  toast('Día guardado: ' + fecha);
+  renderResumen7Dias();
+}
+
+function borrarDia() {
+  const fecha = document.getElementById('hoy-fecha').value;
+  if (!fecha) return;
+  if (!confirm('¿Borrar el registro de ' + fecha + '?')) return;
+  delete state.dias[fecha];
+  guardar();
+  cargarDia(fecha);
+  toast('Día borrado', false);
+  renderResumen7Dias();
+}
+
+function renderResumen7Dias() {
+  const c = document.getElementById('resumen-7dias');
+  const hoy = new Date();
+  let html = '<table><tr><th>Fecha</th>';
+  BLOQUES.forEach(b => html += `<th>${b.nombre}</th>`);
+  html += '<th>Total hrs</th></tr>';
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(hoy);
+    d.setDate(d.getDate() - i);
+    const fecha = d.toISOString().slice(0, 10);
+    const data = state.dias[fecha];
+    const dayName = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+    html += `<tr${data ? ' class="completed-line"' : ''}><td><strong>${dayName}</strong></td>`;
+    let total = 0;
+    BLOQUES.forEach(b => {
+      const block = data?.bloques?.[b.id];
+      if (block?.done) {
+        html += `<td>✓ ${block.hours}h</td>`;
+        total += block.hours;
+      } else { html += '<td>—</td>'; }
+    });
+    html += `<td><strong>${total.toFixed(1)}h</strong></td></tr>`;
+  }
+  html += '</table>';
+  c.innerHTML = html;
+}
+
+// ============= TAB SEMANA =============
+let semanaActual = lunesDeLaSemana(fechaHoy());
+
+function cambiarSemana(delta) {
+  if (delta === 0) { semanaActual = lunesDeLaSemana(fechaHoy()); }
+  else {
+    const d = new Date(semanaActual + 'T12:00:00');
+    d.setDate(d.getDate() + delta * 7);
+    semanaActual = d.toISOString().slice(0, 10);
+  }
+  cargarSemana();
+}
+
+function cargarSemana() {
+  document.getElementById('semana-label').textContent = semanaLabel(semanaActual);
+  const data = state.semanas[semanaActual] || {};
+  document.getElementById('kpi-postulaciones').value = data.postulaciones || 0;
+  document.getElementById('kpi-entrevistas').value   = data.entrevistas || 0;
+  document.getElementById('kpi-conexiones').value    = data.conexiones || 0;
+  document.getElementById('kpi-freelance').value     = data.freelance || 0;
+  document.getElementById('kpi-proyectos').value     = data.proyectos || 0;
+  document.getElementById('kpi-tarifa').value        = data.tarifa || 0;
+  document.getElementById('kpi-posts').value         = data.posts || 0;
+  document.getElementById('kpi-commits').value       = data.commits || 0;
+  document.getElementById('kpi-certs').value         = data.certs || 0;
+  document.getElementById('kpi-reflexion').value     = data.reflexion || '';
+  document.getElementById('kpi-preguntas').value     = data.preguntas || '';
+  document.getElementById('kpi-plan').value          = data.plan || '';
+  renderKpiBoard();
+}
+
+function guardarSemana(showToast = false) {
+  state.semanas[semanaActual] = {
+    postulaciones: +document.getElementById('kpi-postulaciones').value || 0,
+    entrevistas:   +document.getElementById('kpi-entrevistas').value || 0,
+    conexiones:    +document.getElementById('kpi-conexiones').value || 0,
+    freelance:     +document.getElementById('kpi-freelance').value || 0,
+    proyectos:     +document.getElementById('kpi-proyectos').value || 0,
+    tarifa:        +document.getElementById('kpi-tarifa').value || 0,
+    posts:         +document.getElementById('kpi-posts').value || 0,
+    commits:       +document.getElementById('kpi-commits').value || 0,
+    certs:         +document.getElementById('kpi-certs').value || 0,
+    reflexion:     document.getElementById('kpi-reflexion').value,
+    preguntas:     document.getElementById('kpi-preguntas').value,
+    plan:          document.getElementById('kpi-plan').value,
+    savedAt: new Date().toISOString()
+  };
+  guardar();
+  if (showToast) toast('Semana guardada');
+  renderKpiBoard();
+}
+
+function renderKpiBoard() {
+  const data = state.semanas[semanaActual] || {};
+  const board = document.getElementById('kpi-board');
+  const items = [
+    { l: 'Postulaciones', v: data.postulaciones || 0, t: 5,    invertir: false },
+    { l: 'Entrevistas',   v: data.entrevistas || 0,   t: 0.25, invertir: false },
+    { l: 'Conexiones LI', v: data.conexiones || 0,    t: 10,   invertir: false },
+    { l: 'Freelance USD', v: '$' + (data.freelance || 0), t: '$50',  invertir: false, cmp: data.freelance || 0, cmpT: 50 },
+    { l: 'Proyectos',     v: data.proyectos || 0,     t: 1,    invertir: false },
+    { l: 'Tarifa USD/hr', v: '$' + (data.tarifa || 0), t: '$8',   invertir: false, cmp: data.tarifa || 0, cmpT: 8 },
+    { l: 'Posts LinkedIn', v: data.posts || 0,        t: 2,    invertir: false },
+    { l: 'GitHub commits', v: data.commits || 0,      t: 5,    invertir: false },
+    { l: 'Certs publicados', v: data.certs || 0,      t: 0.5,  invertir: false }
+  ];
+  board.innerHTML = items.map(i => {
+    const cmp = i.cmp !== undefined ? i.cmp : (typeof i.v === 'number' ? i.v : 0);
+    const cmpT = i.cmpT !== undefined ? i.cmpT : (typeof i.t === 'number' ? i.t : 0);
+    const cls = cmp >= cmpT ? 'success' : (cmp >= cmpT * 0.5 ? '' : 'warn');
+    return `<div class="kpi-card ${cls}">
+      <div class="label">${i.l}</div>
+      <div class="value">${i.v}</div>
+      <div class="target">Meta: ${i.t}/sem</div>
+    </div>`;
+  }).join('');
+}
+
+// ============= TAB HITOS =============
+function renderHitos() {
+  // Certs
+  const cc = document.getElementById('lista-certs');
+  cc.innerHTML = '';
+  state.certs.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'milestone-item' + (c.done ? ' done' : '');
+    div.innerHTML = `
+      <input type="checkbox" data-cert-i="${i}" ${c.done ? 'checked' : ''}>
+      <div class="name">
+        <strong>${c.name}</strong>
+        ${c.url ? `<div class="links-list"><a href="${c.url}" target="_blank">${c.url}</a></div>` : ''}
+        <input type="text" data-cert-url="${i}" placeholder="URL del certificado público (LinkedIn)" value="${c.certUrl || ''}" style="margin-top:4px;">
+      </div>
+      <span class="badge badge-blue">${c.target}</span>
+      <button class="danger-link" onclick="borrarCert(${i})">Borrar</button>
+    `;
+    cc.appendChild(div);
+  });
+  cc.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const i = +e.target.dataset.certI;
+      state.certs[i].done = e.target.checked;
+      state.certs[i].doneDate = e.target.checked ? fechaHoy() : null;
+      guardar(); renderHitos();
+    });
+  });
+  cc.querySelectorAll('input[type="text"][data-cert-url]').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const i = +e.target.dataset.certUrl;
+      state.certs[i].certUrl = e.target.value;
+      guardar();
+    });
+  });
+
+  // Repos
+  const rc = document.getElementById('lista-repos');
+  rc.innerHTML = '';
+  state.repos.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'milestone-item' + (r.done ? ' done' : '');
+    div.innerHTML = `
+      <input type="checkbox" data-repo-i="${i}" ${r.done ? 'checked' : ''}>
+      <div class="name">
+        <strong>${r.name}</strong>
+        <input type="text" data-repo-url="${i}" placeholder="URL GitHub público" value="${r.repoUrl || ''}" style="margin-top:4px;">
+      </div>
+      <span class="badge badge-orange">${r.target}</span>
+      <button class="danger-link" onclick="borrarRepo(${i})">Borrar</button>
+    `;
+    rc.appendChild(div);
+  });
+  rc.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const i = +e.target.dataset.repoI;
+      state.repos[i].done = e.target.checked;
+      state.repos[i].doneDate = e.target.checked ? fechaHoy() : null;
+      guardar(); renderHitos();
+    });
+  });
+  rc.querySelectorAll('input[type="text"][data-repo-url]').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const i = +e.target.dataset.repoUrl;
+      state.repos[i].repoUrl = e.target.value;
+      guardar();
+    });
+  });
+
+  // Libros
+  const lc = document.getElementById('lista-libros');
+  lc.innerHTML = '';
+  state.libros.forEach((l, i) => {
+    const div = document.createElement('div');
+    div.className = 'milestone-item' + (l.finished ? ' done' : '');
+    div.innerHTML = `
+      <input type="checkbox" data-libro-i="${i}" ${l.finished ? 'checked' : ''}>
+      <div class="name"><strong>#${l.orden} · ${l.name}</strong></div>
+      <span class="badge ${l.started && !l.finished ? 'badge-orange' : (l.finished ? 'badge-green' : 'badge-blue')}">
+        ${l.finished ? 'Terminado' : (l.started ? 'En curso' : 'Pendiente')}
+      </span>
+      <span></span>
+    `;
+    lc.appendChild(div);
+  });
+  lc.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const i = +e.target.dataset.libroI;
+      if (e.target.checked) {
+        state.libros[i].finished = true;
+        state.libros[i].finishedDate = fechaHoy();
+      } else {
+        state.libros[i].finished = false;
+        state.libros[i].finishedDate = null;
+      }
+      state.libros[i].started = true;
+      guardar(); renderHitos();
+    });
+  });
+
+  // Idiomas
+  document.getElementById('ingles-nivel').value = state.idiomas.ingles;
+  document.getElementById('frances-nivel').value = state.idiomas.frances;
+  document.getElementById('ielts').value = state.idiomas.ielts;
+  document.getElementById('tef').value = state.idiomas.tef;
+}
+
+function guardarHitos() {
+  state.idiomas.ingles  = document.getElementById('ingles-nivel').value;
+  state.idiomas.frances = document.getElementById('frances-nivel').value;
+  state.idiomas.ielts   = document.getElementById('ielts').value;
+  state.idiomas.tef     = document.getElementById('tef').value;
+  guardar();
+  toast('Hitos guardados');
+}
+
+function agregarCert() {
+  const v = document.getElementById('nueva-cert').value.trim();
+  if (!v) return;
+  state.certs.push({ id: 'c' + Date.now(), name: v, target: 'Custom', url: '', done: false, certUrl: '' });
+  document.getElementById('nueva-cert').value = '';
+  guardar(); renderHitos();
+}
+function borrarCert(i) {
+  if (!confirm('¿Borrar esta certificación?')) return;
+  state.certs.splice(i, 1); guardar(); renderHitos();
+}
+function agregarRepo() {
+  const v = document.getElementById('nuevo-repo').value.trim();
+  if (!v) return;
+  state.repos.push({ id: 'r' + Date.now(), name: v, target: 'Custom', done: false, repoUrl: '' });
+  document.getElementById('nuevo-repo').value = '';
+  guardar(); renderHitos();
+}
+function borrarRepo(i) {
+  if (!confirm('¿Borrar este repo?')) return;
+  state.repos.splice(i, 1); guardar(); renderHitos();
+}
+
+// ============= TAB DATOS =============
+function exportarJSON() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tracker_valentina_' + fechaHoy() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Respaldo descargado');
+}
+
+function importarJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!confirm('¿Reemplazar TODOS los datos actuales con el respaldo? (Recomendado: exportar primero el actual)')) return;
+      state = imported;
+      guardar();
+      cargarHoy(); cargarSemana(); renderHitos();
+      toast('Respaldo importado');
+    } catch(err) { toast('Error: archivo inválido', false); }
+  };
+  reader.readAsText(file);
+}
+
+function resetearTodo() {
+  if (!confirm('⚠️ ESTO BORRA TODOS LOS DATOS. ¿Estás 100% segura?')) return;
+  if (!confirm('Última oportunidad. ¿Continuar con el reseteo?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = cargarEstado();
+  guardar();
+  cargarHoy(); cargarSemana(); renderHitos();
+  toast('Datos reseteados', false);
+}
+
+function actualizarStorageInfo() {
+  const data = JSON.stringify(state);
+  const sizeKB = (data.length / 1024).toFixed(2);
+  const dias = Object.keys(state.dias).length;
+  const semanas = Object.keys(state.semanas).length;
+  const certsDone = state.certs.filter(c => c.done).length;
+  const reposDone = state.repos.filter(r => r.done).length;
+  const librosDone = state.libros.filter(l => l.finished).length;
+  document.getElementById('storage-info').innerHTML = `
+    <table>
+      <tr><td><strong>Días registrados</strong></td><td>${dias}</td></tr>
+      <tr><td><strong>Semanas con KPIs</strong></td><td>${semanas}</td></tr>
+      <tr><td><strong>Certificaciones completas</strong></td><td>${certsDone}/${state.certs.length}</td></tr>
+      <tr><td><strong>Repos GitHub completos</strong></td><td>${reposDone}/${state.repos.length}</td></tr>
+      <tr><td><strong>Libros leídos</strong></td><td>${librosDone}/${state.libros.length}</td></tr>
+      <tr><td><strong>Tamaño en navegador</strong></td><td>${sizeKB} KB</td></tr>
+    </table>
+  `;
+}
+
+// ============= GENERACIÓN PDF =============
+function generarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const PW = doc.internal.pageSize.getWidth();
+  const MARGIN = 36;
+  let y = MARGIN;
+
+  const inicio = document.getElementById('reporte-semana-inicio').value || semanaActual;
+  const lunes = lunesDeLaSemana(inicio);
+  const nombre = document.getElementById('reporte-nombre').value || 'Valentina HZ';
+
+  // Header
+  doc.setFillColor(31, 78, 121);
+  doc.rect(0, 0, PW, 70, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text('REPORTE SEMANAL DE EJECUCIÓN', MARGIN, 30);
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.text('Career Architect · Método Grit-Mindset-Carlos-Style', MARGIN, 45);
+  doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+  doc.text(nombre + '  ·  Semana del ' + semanaLabel(lunes), MARGIN, 60);
+  y = 90;
+
+  doc.setTextColor(0, 0, 0);
+
+  // Sección 1: Ejecución diaria
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('1. EJECUCIÓN DIARIA · 6 BLOQUES', MARGIN, y); y += 14;
+
+  const dailyHead = ['Día', ...BLOQUES.map(b => b.nombre.substr(0, 10)), 'Total'];
+  const dailyBody = [];
+  let totalSemana = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lunes + 'T12:00:00');
+    d.setDate(d.getDate() + i);
+    const fecha = d.toISOString().slice(0, 10);
+    const dayLabel = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
+    const data = state.dias[fecha];
+    let total = 0;
+    const row = [dayLabel];
+    BLOQUES.forEach(b => {
+      const block = data?.bloques?.[b.id];
+      if (block?.done) {
+        row.push('✓ ' + (block.hours || 0) + 'h');
+        total += block.hours || 0;
+      } else { row.push('—'); }
+    });
+    row.push(total.toFixed(1) + 'h');
+    totalSemana += total;
+    dailyBody.push(row);
+  }
+  dailyBody.push(['TOTAL', '', '', '', '', '', '', totalSemana.toFixed(1) + 'h']);
+
+  doc.autoTable({
+    startY: y,
+    head: [dailyHead],
+    body: dailyBody,
+    margin: { left: MARGIN, right: MARGIN },
+    styles: { fontSize: 8, cellPadding: 4 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' },
+    didParseCell: function(data) {
+      if (data.row.index === 7) {
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.fillColor = [252, 228, 214];
+      }
+    }
+  });
+  y = doc.lastAutoTable.finalY + 16;
+
+  // Sección 2: KPIs
+  if (y > 700) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('2. KPIs DE LA SEMANA', MARGIN, y); y += 14;
+
+  const sd = state.semanas[lunes] || {};
+  const kpiBody = [
+    ['Postulaciones formales',    sd.postulaciones || 0,  '5/sem',  (sd.postulaciones || 0) >= 5 ? '✓' : '✗'],
+    ['Entrevistas',                sd.entrevistas || 0,    '1/mes',  (sd.entrevistas || 0) >= 1 ? '✓' : '—'],
+    ['Conexiones LinkedIn',        sd.conexiones || 0,     '10/sem', (sd.conexiones || 0) >= 10 ? '✓' : '✗'],
+    ['Freelance USD',              '$' + (sd.freelance || 0), '$50/sem', (sd.freelance || 0) >= 50 ? '✓' : '✗'],
+    ['Proyectos entregados',       sd.proyectos || 0,      '1/sem',  (sd.proyectos || 0) >= 1 ? '✓' : '—'],
+    ['Tarifa USD/hr efectiva',     '$' + (sd.tarifa || 0), '$8+',    (sd.tarifa || 0) >= 8 ? '✓' : '—'],
+    ['Posts LinkedIn (inglés)',    sd.posts || 0,          '2/sem',  (sd.posts || 0) >= 2 ? '✓' : '✗'],
+    ['GitHub commits',             sd.commits || 0,        '5/sem',  (sd.commits || 0) >= 5 ? '✓' : '—'],
+    ['Certificaciones publicadas', sd.certs || 0,          '0.5/sem', (sd.certs || 0) >= 1 ? '✓' : '—']
+  ];
+  doc.autoTable({
+    startY: y,
+    head: [['Métrica', 'Esta semana', 'Meta', 'Estado']],
+    body: kpiBody,
+    margin: { left: MARGIN, right: MARGIN },
+    styles: { fontSize: 9, cellPadding: 5 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' },
+    columnStyles: { 3: { halign: 'center', fontStyle: 'bold' } }
+  });
+  y = doc.lastAutoTable.finalY + 16;
+
+  // Sección 3: Reflexión
+  if (y > 650) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('3. REFLEXIÓN Y NOTAS DE LA SEMANA', MARGIN, y); y += 14;
+
+  const printText = (titulo, contenido, color) => {
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(...color);
+    doc.text(titulo, MARGIN, y); y += 12;
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+    const txt = contenido || '(sin notas)';
+    const lines = doc.splitTextToSize(txt, PW - MARGIN * 2);
+    if (y + lines.length * 11 > 750) { doc.addPage(); y = MARGIN; }
+    doc.text(lines, MARGIN, y);
+    y += lines.length * 11 + 10;
+  };
+  printText('🏆 Logros y aprendizajes:',  sd.reflexion, [56, 87, 35]);
+  printText('🤔 Preguntas para el coach:', sd.preguntas, [197, 80, 75]);
+  printText('📅 Plan próxima semana:',     sd.plan,      [31, 78, 121]);
+
+  // Sección 4: Wins/Blockers diarios condensados
+  if (y > 600) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('4. NOTAS DIARIAS (Wins / Blockers)', MARGIN, y); y += 14;
+
+  const notasBody = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lunes + 'T12:00:00');
+    d.setDate(d.getDate() + i);
+    const fecha = d.toISOString().slice(0, 10);
+    const data = state.dias[fecha];
+    if (data && (data.wins || data.blockers)) {
+      const dayLabel = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+      notasBody.push([dayLabel, data.wins || '—', data.blockers || '—']);
+    }
+  }
+  if (notasBody.length === 0) notasBody.push(['(sin notas registradas esta semana)', '', '']);
+  doc.autoTable({
+    startY: y,
+    head: [['Día', 'Wins', 'Blockers']],
+    body: notasBody,
+    margin: { left: MARGIN, right: MARGIN },
+    styles: { fontSize: 8, cellPadding: 4 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' },
+    columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 220 }, 2: { cellWidth: 220 } }
+  });
+  y = doc.lastAutoTable.finalY + 16;
+
+  // Sección 5: Hitos al día de hoy
+  if (y > 600) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('5. ESTADO DE HITOS AL DÍA DE HOY', MARGIN, y); y += 14;
+
+  const certsDone = state.certs.filter(c => c.done).length;
+  const reposDone = state.repos.filter(r => r.done).length;
+  const librosDone = state.libros.filter(l => l.finished).length;
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(`• Certificaciones: ${certsDone}/${state.certs.length} completas`, MARGIN + 10, y); y += 12;
+  doc.text(`• Repos GitHub: ${reposDone}/${state.repos.length} publicados`, MARGIN + 10, y); y += 12;
+  doc.text(`• Libros del plan: ${librosDone}/${state.libros.length} terminados`, MARGIN + 10, y); y += 12;
+  doc.text(`• Inglés: ${state.idiomas.ingles}${state.idiomas.ielts ? ' (IELTS ' + state.idiomas.ielts + ')' : ''}`, MARGIN + 10, y); y += 12;
+  doc.text(`• Francés: ${state.idiomas.frances}${state.idiomas.tef ? ' (TEF ' + state.idiomas.tef + ')' : ''}`, MARGIN + 10, y); y += 18;
+
+  // Sección 6: REVISIÓN DEL COACH (en blanco)
+  if (y > 540) { doc.addPage(); y = MARGIN; }
+  doc.setDrawColor(197, 80, 75); doc.setLineWidth(2);
+  doc.line(MARGIN, y, PW - MARGIN, y); y += 18;
+  doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(197, 80, 75);
+  doc.text('6. REVISIÓN DEL COACH (a completar al revisar)', MARGIN, y); y += 14;
+  doc.setFontSize(8); doc.setFont('helvetica', 'italic'); doc.setTextColor(120, 120, 120);
+  doc.text('Esta sección la llena el coach (Claude o mentor humano) cuando recibe el reporte. Si lo llena Claude, pídele que use el método Career Architect: directo, con tablas, sin motivación falsa.', MARGIN, y); y += 18;
+
+  const coachSecciones = [
+    { t: '✅ Lo que destacó esta semana (lo bien hecho)', h: 60 },
+    { t: '🎯 Áreas a corregir (con honestidad)', h: 70 },
+    { t: '🛠️ Recomendaciones específicas para próxima semana', h: 90 },
+    { t: '⚠️ Riesgos detectados en el patrón de las últimas semanas', h: 60 },
+    { t: '📊 Ajustes propuestos al Plan Maestro (si aplica)', h: 60 }
+  ];
+  doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(60, 60, 60);
+  coachSecciones.forEach(s => {
+    if (y + s.h > 750) { doc.addPage(); y = MARGIN; }
+    doc.text(s.t, MARGIN, y); y += 12;
+    doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.5);
+    doc.rect(MARGIN, y, PW - MARGIN * 2, s.h);
+    y += s.h + 10;
+  });
+
+  // Footer
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.setFont('helvetica', 'italic');
+    doc.text('Tracker Valentina HZ · Career Architect · Pág ' + i + '/' + totalPages,
+             PW / 2, 800, { align: 'center' });
+  }
+
+  doc.save('reporte_semanal_' + lunes + '.pdf');
+  toast('Reporte PDF generado');
+}
+
+function generarPDFCompleto() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const PW = doc.internal.pageSize.getWidth();
+  const MARGIN = 36;
+  let y = MARGIN;
+
+  doc.setFillColor(31, 78, 121);
+  doc.rect(0, 0, PW, 60, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+  doc.text('REPORTE COMPLETO DE HITOS', MARGIN, 30);
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.text('Estado al ' + new Date().toLocaleDateString('es-MX'), MARGIN, 48);
+  y = 80;
+
+  doc.setTextColor(0, 0, 0);
+
+  doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('CERTIFICACIONES', MARGIN, y); y += 12;
+  doc.autoTable({
+    startY: y,
+    head: [['Certificación', 'Meta', 'Estado', 'Fecha', 'URL Certificado']],
+    body: state.certs.map(c => [
+      c.name, c.target, c.done ? '✓ Hecho' : '⏳ Pendiente',
+      c.doneDate || '—', c.certUrl ? c.certUrl.substr(0, 40) + '...' : '—'
+    ]),
+    margin: { left: MARGIN, right: MARGIN },
+    styles: { fontSize: 8, cellPadding: 4 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' }
+  });
+  y = doc.lastAutoTable.finalY + 16;
+
+  if (y > 600) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('REPOSITORIOS GITHUB', MARGIN, y); y += 12;
+  doc.autoTable({
+    startY: y,
+    head: [['Repo', 'Meta', 'Estado', 'Fecha', 'URL GitHub']],
+    body: state.repos.map(r => [
+      r.name, r.target, r.done ? '✓ Hecho' : '⏳ Pendiente',
+      r.doneDate || '—', r.repoUrl ? r.repoUrl.substr(0, 40) + '...' : '—'
+    ]),
+    margin: { left: MARGIN, right: MARGIN },
+    styles: { fontSize: 8, cellPadding: 4 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' }
+  });
+  y = doc.lastAutoTable.finalY + 16;
+
+  if (y > 600) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('LIBROS DEL PLAN', MARGIN, y); y += 12;
+  doc.autoTable({
+    startY: y,
+    head: [['#', 'Libro', 'Estado', 'Fecha terminado']],
+    body: state.libros.map(l => [
+      l.orden, l.name,
+      l.finished ? '✓ Terminado' : (l.started ? 'En curso' : 'Pendiente'),
+      l.finishedDate || '—'
+    ]),
+    margin: { left: MARGIN, right: MARGIN },
+    styles: { fontSize: 9, cellPadding: 5 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' }
+  });
+  y = doc.lastAutoTable.finalY + 16;
+
+  if (y > 700) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('IDIOMAS', MARGIN, y); y += 14;
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(`Inglés: ${state.idiomas.ingles}${state.idiomas.ielts ? '  ·  IELTS ' + state.idiomas.ielts : ''}`, MARGIN, y); y += 14;
+  doc.text(`Francés: ${state.idiomas.frances}${state.idiomas.tef ? '  ·  TEF ' + state.idiomas.tef : ''}`, MARGIN, y); y += 14;
+
+  doc.save('reporte_hitos_' + fechaHoy() + '.pdf');
+  toast('Reporte completo generado');
+}
+
+// ============= INIT =============
+document.getElementById('reporte-semana-inicio').value = lunesDeLaSemana(fechaHoy());
+document.getElementById('reporte-semana-inicio').addEventListener('change', e => {
+  const lunes = lunesDeLaSemana(e.target.value);
+  document.getElementById('reporte-semana-rango').textContent = 'Semana ajustada: ' + semanaLabel(lunes);
+});
+
+cargarHoy();
+cargarSemana();
+renderHitos();
+renderResumen7Dias();
+actualizarStorageInfo();
+</script>
+
+</body>
+</html>
