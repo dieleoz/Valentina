@@ -17,15 +17,15 @@ Progresión de fases para transformar este *tracker* personal en una herramienta
 > Responde tres huecos detectados en auditoría: no se pueden editar bloques, los libros son una checklist estática, y el único export es PDF local (no permite backup ni análisis).
 > Tres ramas independientes, cada una se mergea cuando pasa validación.
 
-### 1.5.1 · Categorías editables — `feat/categorias-editables`
-*   **[ ]** Migrar `BLOQUES` (constante hardcodeada) a `state.plan.categorias` (editable, en Mongo).
-*   **[ ]** Migración automática: si el doc no tiene `plan.categorias`, generarlo desde los 6 IDs originales (`ingles`, `tech`, `empleo`, `certs`, `freelance`, `lectura`). IDs estables → histórico intacto.
-*   **[ ]** UI: botón `＋ Bloque` (agregar), `✎` (renombrar nombre/meta_min/meta_max/color), `⋯` (archivar / eliminar si no hay registros / ↑↓ reordenar).
-*   **[ ]** Archivar preserva histórico (los días viejos siguen mostrando "Inglés 1.5h" aunque el bloque ya no aparezca en "Hoy").
-*   **[ ]** Eliminar definitivo solo si no hay días con `hours > 0` en esa categoría.
-*   **[ ]** Sección colapsable "Categorías archivadas" al final del listado.
-*   **[ ]** `renderBloques`, `leerBloquesUI`, `renderResumen7Dias`, `generarPDF*` consumen la lista dinámica.
-*   **[ ]** Validación: agregar/renombrar/archivar en deploy live, histórico intacto, PDF semanal idéntico.
+### 1.5.1 · Categorías editables — `feat/categorias-editables` ✅
+*   **[X]** Migrar `BLOQUES` (constante hardcodeada) a `state.plan.categorias` (editable, en Mongo).
+*   **[X]** Migración automática: si el doc no tiene `plan.categorias`, generarlo desde los 6 IDs originales (`ingles`, `tech`, `empleo`, `certs`, `freelance`, `lectura`). IDs estables → histórico intacto.
+*   **[X]** UI: botón `＋ Bloque` (agregar), `✎` (renombrar nombre/meta_min/meta_max/color), `⋯` (archivar / eliminar si no hay registros / ↑↓ reordenar).
+*   **[X]** Archivar preserva histórico (los días viejos siguen mostrando "Inglés 1.5h" aunque el bloque ya no aparezca en "Hoy").
+*   **[X]** Eliminar definitivo solo si no hay días con `hours > 0` en esa categoría.
+*   **[X]** Sección colapsable "Categorías archivadas" al final del listado.
+*   **[X]** `renderBloques`, `leerBloquesUI`, `renderResumen7Dias`, `generarPDF*` consumen la lista dinámica.
+*   **[X]** Validación: agregar/renombrar/archivar en deploy live, histórico intacto, PDF semanal idéntico. Mergeado 2026-05-15.
 
 ### 1.5.2 · Biblioteca de libros viva — `feat/biblioteca-libros`
 *   **[ ]** Modelo de libros con estados (`pendiente`/`leyendo`/`pausado`/`terminado`/`abandonado`), progreso por página, fechas de inicio/fin, sesiones, motivo de abandono.
