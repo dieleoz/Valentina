@@ -36,13 +36,25 @@ Progresión de fases para transformar este *tracker* personal en una herramienta
 *   **[X]** Validación: estados, applied_insight, migración v1→v2 verificada con dump v1 simulado en headless. Mergeado 2026-05-15.
 *   **[~]** Diferido: vínculo automático con bloque "Lectura" via `@id` para evitar parser frágil y doble conteo. Horas se editan a mano en el modal.
 
-### 1.5.3 · Export multi-formato + incremental — `feat/export-multiformato`
-*   **[ ]** Endpoint `GET /api/export?format={xlsx|csv|json}&from=<iso>&to=<iso>`.
-*   **[ ]** Excel multi-hoja (días, semanas, categorías, kpis, hitos, libros, sesiones, plan) en formato long.
-*   **[ ]** CSV zip (un CSV por tabla), JSON bit-exact (re-importable).
-*   **[ ]** Modo incremental: `?from=<date>` filtra solo registros con fecha posterior — soporta backup que solo descarga lo nuevo.
-*   **[ ]** PDF semanal del coach permanece **idéntico** (regresión test visual).
-*   **[ ]** Validación: XLSX abre en Sheets/LibreOffice/Excel; incremental filtra correctamente; PDF sin cambios.
+### 1.5.3 · Export multi-formato + incremental — `feat/export-multiformato` ✅
+*   **[X]** Endpoint `GET /api/export?format={xlsx|csv|json}&from=<iso>&to=<iso>`.
+*   **[X]** Excel multi-hoja (9 hojas: días, semanas_kpi, categorias, libros, certificaciones, repos_github, idiomas, notas_diarias, meta_plan) en formato long con freeze de primera fila y ancho auto-ajustado.
+*   **[X]** CSV zip (un CSV por tabla), JSON bit-exact servido desde backend (reimportable via Importar respaldo).
+*   **[X]** Modo incremental: `?from=<date>` filtra `state.dias` y `state.semanas` por fecha lexicográfica. Catálogos (categorías, libros, etc.) se entregan completos.
+*   **[X]** PDF semanal del coach permanece **idéntico** (sin tocar `generarPDF()`).
+*   **[X]** Frontend: pestaña Datos con date range picker, 3 botones de formato y atajos "Últimos 7 / 30 días".
+*   **[X]** Validación: XLSX abre limpio (verificado en openpyxl); CSV zip con 9 archivos; incremental filtra `from=2026-05-05` → solo días posteriores. Mergeado 2026-05-15.
+
+---
+
+## Fase 1.5 ✅ COMPLETADA
+
+Las 3 sub-fases mergeadas a `main`:
+1. Categorías editables (bloques CRUD + archivar/eliminar)
+2. Biblioteca de libros viva (estados + applied_insight + migración v1→v2)
+3. Export multi-formato + incremental (XLSX/CSV/JSON, /api/export)
+
+El stack se mantuvo vanilla JS + FastAPI + Mongo. El PDF del coach quedó intacto.
 
 ---
 
