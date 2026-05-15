@@ -688,15 +688,38 @@
 <!-- ============= TAB DATOS ============= -->
 <section id="tab-datos" class="tab-content">
   <div class="card">
-    <h2>Respaldo y restauración</h2>
-    <div class="info-box">Tus datos se guardan automáticamente en este navegador. Para tener un respaldo real "en disco", exporta el JSON cada semana y guárdalo en una carpeta de Drive/iCloud.</div>
+    <h2>Exportar datos (XLSX / CSV / JSON)</h2>
+    <div class="info-box">El PDF semanal sigue siendo el formato del coach. <strong>Excel</strong> y <strong>CSV</strong> son para análisis y backup real — abren en Sheets, LibreOffice y Excel. <strong>JSON</strong> es bit-exact reimportable.<br>El rango es opcional: dejá ambos vacíos para descargar todo. <strong>"Desde"</strong> activa el modo incremental (solo lo nuevo desde esa fecha).</div>
 
+    <div class="grid-2" style="margin-top:12px">
+      <div>
+        <label>Desde (YYYY-MM-DD)</label>
+        <input type="date" id="export-from" placeholder="todo">
+      </div>
+      <div>
+        <label>Hasta (YYYY-MM-DD)</label>
+        <input type="date" id="export-to" placeholder="hoy">
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="btn" onclick="descargarExport('xlsx')">📊 Excel (.xlsx multi-hoja)</button>
+      <button class="btn" onclick="descargarExport('csv')">📄 CSV (zip)</button>
+      <button class="btn secondary" onclick="descargarExport('json')">📥 JSON completo</button>
+      <button class="btn secondary" onclick="descargarExportRapido(7)">⏩ Últimos 7 días</button>
+      <button class="btn secondary" onclick="descargarExportRapido(30)">⏩ Últimos 30 días</button>
+    </div>
+    <div class="small" style="margin-top:8px;color:#666" id="export-info"></div>
+  </div>
+
+  <div class="card">
+    <h2>Respaldo y restauración (legacy)</h2>
+    <div class="info-box">Importación toma un JSON exportado previamente y <strong>reemplaza</strong> todo el estado actual.</div>
     <div style="margin-top: 14px;">
-      <button class="btn" onclick="exportarJSON()">📥 Exportar todos los datos (JSON)</button>
+      <button class="btn" onclick="exportarJSON()">📥 Exportar JSON (cliente, sin filtro)</button>
       <button class="btn secondary" onclick="document.getElementById('importar-input').click()">📤 Importar respaldo (JSON)</button>
       <input type="file" id="importar-input" accept=".json" style="display:none" onchange="importarJSON(event)">
     </div>
-
     <div style="margin-top: 24px;">
       <button class="btn danger" onclick="resetearTodo()">⚠️ Resetear TODO (borra todos los datos)</button>
     </div>
@@ -1958,6 +1981,33 @@ function borrarRepo(i) {
 }
 
 // ============= TAB DATOS =============
+function descargarExport(format) {
+  const from = document.getElementById('export-from').value;
+  const to = document.getElementById('export-to').value;
+  const params = new URLSearchParams({ format });
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  const info = document.getElementById('export-info');
+  info.textContent = 'Generando ' + format.toUpperCase() + (from ? ` desde ${from}` : ' completo') + '…';
+  // Disparamos como navegación → fuerza download del navegador (respeta Content-Disposition)
+  const a = document.createElement('a');
+  a.href = '/api/export?' + params.toString();
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => { info.textContent = 'Descarga disparada — revisá tu carpeta de descargas.'; }, 800);
+}
+
+function descargarExportRapido(dias) {
+  const d = new Date();
+  d.setDate(d.getDate() - dias);
+  const from = d.toISOString().slice(0, 10);
+  document.getElementById('export-from').value = from;
+  document.getElementById('export-to').value = '';
+  descargarExport('xlsx');
+}
+
 function exportarJSON() {
   const data = JSON.stringify(state, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
