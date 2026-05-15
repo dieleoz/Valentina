@@ -54,7 +54,11 @@ Las 3 sub-fases mergeadas a `main`:
 2. Biblioteca de libros viva (estados + applied_insight + migración v1→v2)
 3. Export multi-formato + incremental (XLSX/CSV/JSON, /api/export)
 
-El stack se mantuvo vanilla JS + FastAPI + Mongo. El PDF del coach quedó intacto.
+Fix post-validación (mergeado 2026-05-15):
+*   **[X]** PDF sin caracteres basura: Helvetica no soporta emoji → reemplazo por texto plano en tabla KPI, secciones de reflexión, coach y biblioteca.
+*   **[X]** Idiomas editables: `state.idiomas` migra de objeto plano (`{ingles, frances, ielts, tef}`) a array `[{id, nombre, nivel, examen_nombre, examen_score, orden}]`. Soporta cualquier idioma con cualquier examen — no más hardcoded Inglés/Francés.
+
+El stack se mantuvo vanilla JS + FastAPI + Mongo. El PDF del coach quedó intacto en estructura, sólo se limpió la tipografía.
 
 ---
 
