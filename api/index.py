@@ -229,10 +229,27 @@ def _build_tables(state: dict) -> Dict[str, list]:
             "url_repo": r.get("repoUrl"),
         })
 
-    # 7. idiomas (key/value)
+    # 7. idiomas (array de v2; soporta dict legacy v1 también)
     idiomas_rows = []
-    for k, v in (state.get("idiomas") or {}).items():
-        idiomas_rows.append({"campo": k, "valor": v})
+    idiomas_data = state.get("idiomas")
+    if isinstance(idiomas_data, list):
+        for it in idiomas_data:
+            if not isinstance(it, dict):
+                continue
+            idiomas_rows.append({
+                "id": it.get("id"),
+                "nombre": it.get("nombre"),
+                "nivel": it.get("nivel"),
+                "examen_nombre": it.get("examen_nombre"),
+                "examen_score": it.get("examen_score"),
+                "orden": it.get("orden"),
+            })
+    elif isinstance(idiomas_data, dict):
+        # legacy: { ingles: 'B2', frances: 'A0', ielts: '...', tef: '...' }
+        idiomas_rows = [
+            {"id": "ingles",  "nombre": "Inglés",  "nivel": idiomas_data.get("ingles"),  "examen_nombre": "IELTS", "examen_score": idiomas_data.get("ielts"), "orden": 0},
+            {"id": "frances", "nombre": "Francés", "nivel": idiomas_data.get("frances"), "examen_nombre": "TEF",   "examen_score": idiomas_data.get("tef"),   "orden": 1},
+        ]
 
     # 8. meta plan
     plan = state.get("plan") or {}
