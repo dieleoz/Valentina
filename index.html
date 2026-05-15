@@ -189,6 +189,129 @@
   .week-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
   .week-nav button { padding: 6px 10px; }
   .completed-line { background: #E8F5E9; }
+
+  /* Bloques editables */
+  .block-row {
+    grid-template-columns: 24px 1.4fr 70px 2fr auto;
+  }
+  .block-actions { display: flex; gap: 4px; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    width: 28px; height: 28px;
+    font-size: 14px;
+    color: #595959;
+    border-radius: 4px;
+    padding: 0;
+  }
+  .icon-btn:hover { background: #F0F0F0; border-color: #DDD; color: #1F4E79; }
+  .cat-color-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .bloques-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin: 18px 0 10px 0;
+  }
+  .bloques-header h3 { margin: 0; }
+  .bloques-header .btn { margin: 0; padding: 6px 12px; font-size: 13px; }
+  .archived-section {
+    margin-top: 12px;
+    border-top: 1px dashed #DDD;
+    padding-top: 8px;
+  }
+  .archived-section summary {
+    cursor: pointer; font-size: 13px;
+    color: #595959; padding: 6px 0;
+    user-select: none;
+  }
+  .archived-section summary:hover { color: #1F4E79; }
+  .archived-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px dotted #EEE;
+  }
+  .archived-row:last-child { border-bottom: none; }
+  @media (max-width: 720px) {
+    .block-row { grid-template-columns: 24px 1fr auto; }
+    .block-row .hours-cell, .block-row .desc-cell { grid-column: 1 / -1; }
+    .block-actions { grid-column: 3; grid-row: 1; }
+    .archived-row { grid-template-columns: auto 1fr; gap: 6px; }
+  }
+
+  /* Menú contextual de categoría */
+  .cat-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #DDD;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    padding: 4px;
+    min-width: 200px;
+    z-index: 200;
+  }
+  .cat-menu button {
+    display: block; width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none; padding: 8px 12px;
+    cursor: pointer; font-size: 13px;
+    border-radius: 4px;
+    color: #1A1A1A;
+  }
+  .cat-menu button:hover { background: #F2F2F2; }
+  .cat-menu button.danger { color: #C5504B; }
+  .cat-menu button.danger:disabled { color: #BBB; cursor: not-allowed; }
+  .cat-menu button.danger:disabled:hover { background: transparent; }
+  .cat-menu hr { border: none; border-top: 1px solid #EEE; margin: 4px 0; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 150;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    width: 90%; max-width: 460px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+  }
+  .modal h2 {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #D9E2F3;
+  }
+  .modal .form-row { margin-bottom: 12px; }
+  .modal .form-row label { margin-bottom: 4px; }
+  .modal .form-actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+    margin-top: 18px;
+  }
+  .color-picker-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    align-items: center;
+  }
+  .color-swatch {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .color-swatch.selected { border-color: #1A1A1A; }
 </style>
 </head>
 <body>
@@ -223,10 +346,14 @@
       </div>
     </div>
 
-    <h3>Los 6 bloques de hoy</h3>
+    <div class="bloques-header">
+      <h3>Tus bloques de hoy</h3>
+      <button class="btn" onclick="agregarCategoria()">＋ Bloque</button>
+    </div>
     <div class="info-box">Marca solo lo que ya hiciste. Las horas son reales, no aspiracionales. La columna "qué hice" debe ser concreta — "Kaggle Pandas módulo 3" no "estudié Python".</div>
 
     <div id="bloques-container"></div>
+    <div id="archivadas-container"></div>
 
     <h3>Reflexión del día</h3>
     <div class="grid-2">
@@ -470,19 +597,122 @@
 
 </main>
 
+<!-- Modal agregar/editar categoría -->
+<div class="modal-overlay" id="categoria-modal" onclick="if(event.target===this)cerrarModalCategoria()">
+  <div class="modal">
+    <h2 id="categoria-modal-title">Nueva categoría</h2>
+    <input type="hidden" id="categoria-modal-id" value="">
+    <div class="form-row">
+      <label>Nombre del bloque</label>
+      <input type="text" id="categoria-modal-nombre" placeholder="Ej: Networking, Francés…" maxlength="40">
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Meta mínima (h/día)</label>
+        <input type="number" id="categoria-modal-meta-min" min="0" step="0.25" value="0.5">
+      </div>
+      <div class="form-row">
+        <label>Meta máxima (h/día)</label>
+        <input type="number" id="categoria-modal-meta-max" min="0" step="0.25" value="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Color</label>
+      <div class="color-picker-row" id="categoria-modal-colores"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalCategoria()">Cancelar</button>
+      <button class="btn success" onclick="guardarCategoriaModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
 // ============= ESTADO Y BLOQUES =============
 
-const BLOQUES = [
-  { id: 'ingles',    nombre: 'Inglés',         meta: '1-1.5 hrs/día' },
-  { id: 'tech',      nombre: 'Tech Stack',     meta: '1-2 hrs/día (Python/R/SQL/ML)' },
-  { id: 'empleo',    nombre: 'Empleo formal',  meta: 'Jornada laboral MX' },
-  { id: 'certs',     nombre: 'Certificaciones', meta: '0.5-1 hr/día (HACCP/ISO/COFEPRIS)' },
-  { id: 'freelance', nombre: 'Freelance',      meta: '2 hrs/día (Upwork/Preply/Kolabtree)' },
-  { id: 'lectura',   nombre: 'Lectura libro',  meta: '30 min/día (los 5 del plan)' }
+// Bloques originales del plan — sólo se usan para migración v1→v2.
+// El estado vivo está en state.plan.categorias y es editable desde la UI.
+const BLOQUES_DEFAULT = [
+  { id: 'ingles',    nombre: 'Inglés',          meta_min: 1.0, meta_max: 1.5, color: '#4F81BD', orden: 0 },
+  { id: 'tech',      nombre: 'Tech Stack',      meta_min: 1.0, meta_max: 2.0, color: '#385723', orden: 1 },
+  { id: 'empleo',    nombre: 'Empleo formal',   meta_min: 8.0, meta_max: 9.0, color: '#1F4E79', orden: 2 },
+  { id: 'certs',     nombre: 'Certificaciones', meta_min: 0.5, meta_max: 1.0, color: '#C5504B', orden: 3 },
+  { id: 'freelance', nombre: 'Freelance',       meta_min: 2.0, meta_max: 2.0, color: '#E2A93B', orden: 4 },
+  { id: 'lectura',   nombre: 'Lectura libro',   meta_min: 0.5, meta_max: 0.5, color: '#7030A0', orden: 5 }
 ];
+
+const PALETA_COLORES = [
+  '#4F81BD', '#385723', '#1F4E79', '#C5504B',
+  '#E2A93B', '#7030A0', '#2E75B6', '#A5A5A5'
+];
+
+function buildDefaultCategorias() {
+  const hoy = fechaHoy();
+  return BLOQUES_DEFAULT.map(b => ({
+    id: b.id,
+    nombre: b.nombre,
+    meta_min: b.meta_min,
+    meta_max: b.meta_max,
+    color: b.color,
+    orden: b.orden,
+    estado: 'activo',
+    creado_en: hoy,
+    archivado_en: null
+  }));
+}
+
+function categoriaMetaLabel(c) {
+  if (!c) return '';
+  if (c.meta_min === c.meta_max) return c.meta_min + ' h/día';
+  return c.meta_min + '–' + c.meta_max + ' h/día';
+}
+
+function getCategoriasActivas() {
+  if (!state.plan?.categorias) return [];
+  return state.plan.categorias
+    .filter(c => c.estado === 'activo')
+    .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+}
+
+function getCategoriasArchivadas() {
+  if (!state.plan?.categorias) return [];
+  return state.plan.categorias
+    .filter(c => c.estado === 'archivado')
+    .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+}
+
+function getCategoriaById(id) {
+  return state.plan?.categorias?.find(c => c.id === id) || null;
+}
+
+function nombreDeBloque(id) {
+  return getCategoriaById(id)?.nombre || id;
+}
+
+function categoriaTieneRegistros(id) {
+  for (const fecha in (state.dias || {})) {
+    const b = state.dias[fecha].bloques?.[id];
+    if (b && ((b.hours || 0) > 0 || b.done || (b.what && b.what.trim()))) return true;
+  }
+  return false;
+}
+
+function nuevoIdCategoria(nombre) {
+  let base = (nombre || 'cat').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'cat';
+  let id = base, n = 1;
+  const existing = new Set((state.plan?.categorias || []).map(c => c.id));
+  while (existing.has(id)) { id = base + '-' + (++n); }
+  return id;
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function escapeAttr(s) { return String(s ?? '').replace(/"/g, '&quot;'); }
 
 const CERTS_DEFAULT = [
   { id: 'haccp', name: 'HACCP - Inocuidad alimentaria', target: 'Mes 1', url: 'https://alison.com' },
@@ -514,8 +744,10 @@ const LIBROS_DEFAULT = [
 
 function defaultState() {
   return {
+    schema_version: 2,
     dias: {},
     semanas: {},
+    plan: { categorias: buildDefaultCategorias() },
     certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
     repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
     libros: LIBROS_DEFAULT.map(l => ({ ...l, started: false, finished: false, finishedDate: null })),
@@ -538,6 +770,13 @@ async function cargarEstado() {
         s.repos = s.repos || state.repos;
         s.libros = s.libros || state.libros;
         s.idiomas = s.idiomas || state.idiomas;
+        // Migración v1 → v2: si no hay plan.categorias, generarlas desde defaults.
+        // Los registros diarios viejos (state.dias[...].bloques.ingles, .tech, etc.)
+        // siguen funcionando porque los IDs son los mismos.
+        if (!s.plan || !Array.isArray(s.plan.categorias)) {
+          s.plan = { ...(s.plan || {}), categorias: buildDefaultCategorias() };
+        }
+        s.schema_version = 2;
         state = s;
       }
     }
@@ -606,30 +845,263 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
 function renderBloques(diaData) {
   const c = document.getElementById('bloques-container');
   c.innerHTML = '';
-  BLOQUES.forEach(b => {
-    const data = (diaData?.bloques?.[b.id]) || { done: false, hours: 0, what: '' };
+  const activas = getCategoriasActivas();
+
+  if (activas.length === 0) {
+    const archivadas = getCategoriasArchivadas();
+    c.innerHTML = `
+      <div class="info-box" style="background:#FCE4D6;border-left-color:#C5504B">
+        <strong>Tu plan no tiene categorías activas.</strong>
+        ${archivadas.length > 0
+          ? ` Restaurá alguna de las ${archivadas.length} archivadas o creá una nueva con <em>＋ Bloque</em>.`
+          : ' Creá la primera con <em>＋ Bloque</em>.'}
+      </div>`;
+    renderArchivadas();
+    return;
+  }
+
+  activas.forEach(cat => {
+    const data = (diaData?.bloques?.[cat.id]) || { done: false, hours: 0, what: '' };
     const div = document.createElement('div');
     div.className = 'block-row';
     div.innerHTML = `
-      <input type="checkbox" data-bloque="${b.id}" data-field="done" ${data.done ? 'checked' : ''}>
-      <div class="block-name">${b.nombre}<div class="small" style="font-weight: 400;">${b.meta}</div></div>
-      <div class="hours-cell"><input type="number" min="0" step="0.25" data-bloque="${b.id}" data-field="hours" value="${data.hours}" placeholder="hrs"></div>
-      <div class="desc-cell"><input type="text" data-bloque="${b.id}" data-field="what" value="${(data.what||'').replace(/"/g,'&quot;')}" placeholder="¿Qué hice exactamente?"></div>
+      <input type="checkbox" data-bloque="${cat.id}" data-field="done" ${data.done ? 'checked' : ''}>
+      <div class="block-name">
+        <span class="cat-color-dot" style="background:${cat.color}"></span>${escapeHtml(cat.nombre)}
+        <div class="small" style="font-weight: 400;">${categoriaMetaLabel(cat)}</div>
+      </div>
+      <div class="hours-cell"><input type="number" min="0" step="0.25" data-bloque="${cat.id}" data-field="hours" value="${data.hours}" placeholder="hrs"></div>
+      <div class="desc-cell"><input type="text" data-bloque="${cat.id}" data-field="what" value="${escapeAttr(data.what||'')}" placeholder="¿Qué hice exactamente?"></div>
+      <div class="block-actions">
+        <button class="icon-btn" title="Editar" onclick="editarCategoria('${cat.id}')">✎</button>
+        <button class="icon-btn" title="Más opciones" onclick="abrirMenuCategoria(event, '${cat.id}')">⋯</button>
+      </div>
     `;
     c.appendChild(div);
   });
+
+  renderArchivadas();
+}
+
+function renderArchivadas() {
+  const wrap = document.getElementById('archivadas-container');
+  if (!wrap) return;
+  const archivadas = getCategoriasArchivadas();
+  if (archivadas.length === 0) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <details class="archived-section">
+      <summary>📦 Categorías archivadas (${archivadas.length})</summary>
+      <div class="archived-list">
+        ${archivadas.map(cat => {
+          const tieneRegistros = categoriaTieneRegistros(cat.id);
+          return `
+          <div class="archived-row">
+            <span class="cat-color-dot" style="background:${cat.color}"></span>
+            <span>${escapeHtml(cat.nombre)}</span>
+            <span class="small">archivado ${cat.archivado_en || '—'}</span>
+            <button class="btn secondary" style="padding:4px 10px;font-size:12px;margin:0" onclick="desarchivarCategoria('${cat.id}')">Reactivar</button>
+            ${tieneRegistros
+              ? `<span class="small" title="Tiene horas registradas — no se puede eliminar sin perder histórico">🔒</span>`
+              : `<button class="danger-link" onclick="eliminarCategoria('${cat.id}')">Eliminar</button>`}
+          </div>`;
+        }).join('')}
+      </div>
+    </details>`;
 }
 
 function leerBloquesUI() {
+  const fecha = document.getElementById('hoy-fecha').value;
+  const existing = state.dias[fecha]?.bloques || {};
   const result = {};
-  BLOQUES.forEach(b => {
-    result[b.id] = {
-      done: document.querySelector(`[data-bloque="${b.id}"][data-field="done"]`).checked,
-      hours: parseFloat(document.querySelector(`[data-bloque="${b.id}"][data-field="hours"]`).value) || 0,
-      what:  document.querySelector(`[data-bloque="${b.id}"][data-field="what"]`).value
+  // Preservar datos de categorías archivadas (no aparecen en la UI pero el día las tenía)
+  Object.keys(existing).forEach(id => {
+    const cat = getCategoriaById(id);
+    if (cat && cat.estado === 'archivado') {
+      result[id] = existing[id];
+    }
+  });
+  // Leer las categorías activas desde la UI
+  getCategoriasActivas().forEach(cat => {
+    const doneEl = document.querySelector(`[data-bloque="${cat.id}"][data-field="done"]`);
+    if (!doneEl) return;
+    result[cat.id] = {
+      done: doneEl.checked,
+      hours: parseFloat(document.querySelector(`[data-bloque="${cat.id}"][data-field="hours"]`).value) || 0,
+      what:  document.querySelector(`[data-bloque="${cat.id}"][data-field="what"]`).value
     };
   });
   return result;
+}
+
+// ============= CRUD CATEGORÍAS =============
+let _modalEditId = null;
+let _modalColor = PALETA_COLORES[0];
+
+function agregarCategoria() { abrirModalCategoria(null); }
+
+function editarCategoria(id) { abrirModalCategoria(id); }
+
+function abrirModalCategoria(id) {
+  _modalEditId = id;
+  const cat = id ? getCategoriaById(id) : null;
+  document.getElementById('categoria-modal-title').textContent = cat ? 'Editar categoría' : 'Nueva categoría';
+  document.getElementById('categoria-modal-id').value = id || '';
+  document.getElementById('categoria-modal-nombre').value = cat?.nombre || '';
+  document.getElementById('categoria-modal-meta-min').value = cat?.meta_min ?? 0.5;
+  document.getElementById('categoria-modal-meta-max').value = cat?.meta_max ?? 1;
+  _modalColor = cat?.color || PALETA_COLORES[0];
+  renderColoresPicker();
+  document.getElementById('categoria-modal').classList.add('show');
+  setTimeout(() => document.getElementById('categoria-modal-nombre').focus(), 50);
+}
+
+function renderColoresPicker() {
+  const wrap = document.getElementById('categoria-modal-colores');
+  wrap.innerHTML = PALETA_COLORES.map(c => `
+    <span class="color-swatch ${c === _modalColor ? 'selected' : ''}"
+          style="background:${c}"
+          data-color="${c}"
+          onclick="seleccionarColor('${c}')"></span>
+  `).join('');
+}
+
+function seleccionarColor(c) { _modalColor = c; renderColoresPicker(); }
+
+function cerrarModalCategoria() {
+  document.getElementById('categoria-modal').classList.remove('show');
+  _modalEditId = null;
+}
+
+function guardarCategoriaModal() {
+  const nombre = document.getElementById('categoria-modal-nombre').value.trim();
+  if (!nombre) { toast('El nombre no puede estar vacío', false); return; }
+  const meta_min = parseFloat(document.getElementById('categoria-modal-meta-min').value) || 0;
+  const meta_max = parseFloat(document.getElementById('categoria-modal-meta-max').value) || meta_min;
+  if (meta_max < meta_min) { toast('Meta máxima debe ser ≥ mínima', false); return; }
+
+  if (!state.plan) state.plan = { categorias: [] };
+  if (!Array.isArray(state.plan.categorias)) state.plan.categorias = [];
+
+  if (_modalEditId) {
+    const cat = getCategoriaById(_modalEditId);
+    if (cat) {
+      cat.nombre = nombre;
+      cat.meta_min = meta_min;
+      cat.meta_max = meta_max;
+      cat.color = _modalColor;
+    }
+  } else {
+    const orden = Math.max(0, ...state.plan.categorias.map(c => c.orden ?? 0)) + 1;
+    state.plan.categorias.push({
+      id: nuevoIdCategoria(nombre),
+      nombre, meta_min, meta_max,
+      color: _modalColor,
+      orden,
+      estado: 'activo',
+      creado_en: fechaHoy(),
+      archivado_en: null
+    });
+  }
+  cerrarModalCategoria();
+  cargarHoy();
+  renderResumen7Dias();
+  guardar();
+  toast(_modalEditId ? 'Categoría actualizada' : 'Categoría agregada');
+}
+
+function abrirMenuCategoria(ev, id) {
+  ev.stopPropagation();
+  cerrarMenusAbiertos();
+  const cat = getCategoriaById(id);
+  if (!cat) return;
+  const tieneRegistros = categoriaTieneRegistros(id);
+  const activas = getCategoriasActivas();
+  const idx = activas.findIndex(c => c.id === id);
+  const puedeSubir = idx > 0;
+  const puedeBajar = idx >= 0 && idx < activas.length - 1;
+
+  const menu = document.createElement('div');
+  menu.className = 'cat-menu';
+  menu.dataset.menu = 'cat';
+  menu.innerHTML = `
+    <button onclick="editarCategoria('${id}');cerrarMenusAbiertos()">✎ Editar</button>
+    <button ${puedeSubir ? '' : 'disabled'} onclick="moverCategoria('${id}',-1);cerrarMenusAbiertos()">↑ Subir</button>
+    <button ${puedeBajar ? '' : 'disabled'} onclick="moverCategoria('${id}',1);cerrarMenusAbiertos()">↓ Bajar</button>
+    <hr>
+    <button onclick="archivarCategoria('${id}');cerrarMenusAbiertos()">📦 Archivar (preserva histórico)</button>
+    <button class="danger" ${tieneRegistros ? 'disabled title="Tiene horas registradas — usá Archivar"' : ''} onclick="eliminarCategoria('${id}');cerrarMenusAbiertos()">🗑 Eliminar definitivo</button>
+  `;
+  document.body.appendChild(menu);
+  const rect = ev.target.getBoundingClientRect();
+  menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+  menu.style.left = Math.max(8, rect.right - menu.offsetWidth + window.scrollX) + 'px';
+  // Cierra al hacer clic fuera
+  setTimeout(() => {
+    document.addEventListener('click', cerrarMenusAbiertos, { once: true });
+  }, 0);
+}
+
+function cerrarMenusAbiertos() {
+  document.querySelectorAll('[data-menu="cat"]').forEach(m => m.remove());
+}
+
+function archivarCategoria(id) {
+  const cat = getCategoriaById(id);
+  if (!cat) return;
+  cat.estado = 'archivado';
+  cat.archivado_en = fechaHoy();
+  cargarHoy();
+  renderResumen7Dias();
+  guardar();
+  toast('"' + cat.nombre + '" archivado');
+}
+
+function desarchivarCategoria(id) {
+  const cat = getCategoriaById(id);
+  if (!cat) return;
+  cat.estado = 'activo';
+  cat.archivado_en = null;
+  // Re-asignar orden al final
+  const maxOrden = Math.max(0, ...getCategoriasActivas().map(c => c.orden ?? 0));
+  cat.orden = maxOrden + 1;
+  cargarHoy();
+  renderResumen7Dias();
+  guardar();
+  toast('"' + cat.nombre + '" reactivado');
+}
+
+function eliminarCategoria(id) {
+  const cat = getCategoriaById(id);
+  if (!cat) return;
+  if (categoriaTieneRegistros(id)) {
+    toast('No se puede eliminar: tiene horas registradas. Archivá en su lugar.', false);
+    return;
+  }
+  const nombreEsperado = prompt(`Escribí "${cat.nombre}" para confirmar la eliminación definitiva:`);
+  if (nombreEsperado !== cat.nombre) {
+    if (nombreEsperado !== null) toast('Nombre no coincide, no se eliminó', false);
+    return;
+  }
+  state.plan.categorias = state.plan.categorias.filter(c => c.id !== id);
+  cargarHoy();
+  renderResumen7Dias();
+  guardar();
+  toast('Categoría eliminada');
+}
+
+function moverCategoria(id, direction) {
+  const activas = getCategoriasActivas();
+  const idx = activas.findIndex(c => c.id === id);
+  if (idx < 0) return;
+  const swapIdx = idx + direction;
+  if (swapIdx < 0 || swapIdx >= activas.length) return;
+  const a = activas[idx], b = activas[swapIdx];
+  const tmp = a.orden ?? idx;
+  a.orden = b.orden ?? swapIdx;
+  b.orden = tmp;
+  cargarHoy();
+  renderResumen7Dias();
+  guardar();
 }
 
 function cargarDia(fecha) {
@@ -678,8 +1150,13 @@ function borrarDia() {
 function renderResumen7Dias() {
   const c = document.getElementById('resumen-7dias');
   const hoy = new Date();
+  const activas = getCategoriasActivas();
+  if (activas.length === 0) {
+    c.innerHTML = '<div class="small">Sin categorías activas. Agregá una desde "Tus bloques de hoy" para empezar a registrar.</div>';
+    return;
+  }
   let html = '<table><tr><th>Fecha</th>';
-  BLOQUES.forEach(b => html += `<th>${b.nombre}</th>`);
+  activas.forEach(b => html += `<th>${escapeHtml(b.nombre)}</th>`);
   html += '<th>Total hrs</th></tr>';
   for (let i = 6; i >= 0; i--) {
     const d = new Date(hoy);
@@ -688,13 +1165,16 @@ function renderResumen7Dias() {
     const data = state.dias[fecha];
     const dayName = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
     html += `<tr${data ? ' class="completed-line"' : ''}><td><strong>${dayName}</strong></td>`;
-    let total = 0;
-    BLOQUES.forEach(b => {
+    activas.forEach(b => {
       const block = data?.bloques?.[b.id];
       if (block?.done) {
         html += `<td>✓ ${block.hours}h</td>`;
-        total += block.hours;
       } else { html += '<td>—</td>'; }
+    });
+    // Total incluye también categorías archivadas que tenían registro ese día
+    let total = 0;
+    Object.values(data?.bloques || {}).forEach(blk => {
+      if (blk?.done) total += blk.hours || 0;
     });
     html += `<td><strong>${total.toFixed(1)}h</strong></td></tr>`;
   }
@@ -1008,9 +1488,10 @@ function generarPDF() {
 
   // Sección 1: Ejecución diaria
   doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
-  doc.text('1. EJECUCIÓN DIARIA · 6 BLOQUES', MARGIN, y); y += 14;
+  const activasPDF = getCategoriasActivas();
+  doc.text('1. EJECUCIÓN DIARIA · ' + activasPDF.length + ' BLOQUES', MARGIN, y); y += 14;
 
-  const dailyHead = ['Día', ...BLOQUES.map(b => b.nombre.substr(0, 10)), 'Total'];
+  const dailyHead = ['Día', ...activasPDF.map(b => b.nombre.substr(0, 10)), 'Total'];
   const dailyBody = [];
   let totalSemana = 0;
   for (let i = 0; i < 7; i++) {
@@ -1019,20 +1500,24 @@ function generarPDF() {
     const fecha = d.toISOString().slice(0, 10);
     const dayLabel = d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
     const data = state.dias[fecha];
-    let total = 0;
     const row = [dayLabel];
-    BLOQUES.forEach(b => {
+    activasPDF.forEach(b => {
       const block = data?.bloques?.[b.id];
       if (block?.done) {
         row.push('✓ ' + (block.hours || 0) + 'h');
-        total += block.hours || 0;
       } else { row.push('—'); }
+    });
+    // Total del día incluye también categorías archivadas con registro
+    let total = 0;
+    Object.values(data?.bloques || {}).forEach(blk => {
+      if (blk?.done) total += blk.hours || 0;
     });
     row.push(total.toFixed(1) + 'h');
     totalSemana += total;
     dailyBody.push(row);
   }
-  dailyBody.push(['TOTAL', '', '', '', '', '', '', totalSemana.toFixed(1) + 'h']);
+  const totalRow = ['TOTAL', ...activasPDF.map(() => ''), totalSemana.toFixed(1) + 'h'];
+  dailyBody.push(totalRow);
 
   doc.autoTable({
     startY: y,
