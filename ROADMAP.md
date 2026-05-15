@@ -27,12 +27,14 @@ Progresión de fases para transformar este *tracker* personal en una herramienta
 *   **[X]** `renderBloques`, `leerBloquesUI`, `renderResumen7Dias`, `generarPDF*` consumen la lista dinámica.
 *   **[X]** Validación: agregar/renombrar/archivar en deploy live, histórico intacto, PDF semanal idéntico. Mergeado 2026-05-15.
 
-### 1.5.2 · Biblioteca de libros viva — `feat/biblioteca-libros`
-*   **[ ]** Modelo de libros con estados (`pendiente`/`leyendo`/`pausado`/`terminado`/`abandonado`), progreso por página, fechas de inicio/fin, sesiones, motivo de abandono.
-*   **[ ]** Campo `applied_insight` prominente — un libro al 100% sin `applied_insight` se marca visualmente como "leído sin aplicar".
-*   **[ ]** Filtros por estado (chips), agregar libros fuera del plan original, vínculo opcional con el bloque "Lectura" para sumar horas.
-*   **[ ]** Una sola fuente para horas de lectura: el bloque registra, las sesiones del libro se derivan — no se duplica.
-*   **[ ]** Validación: cambio de estados, applied_insight persiste, horas no se doble-contabilizan.
+### 1.5.2 · Biblioteca de libros viva — `feat/biblioteca-libros` ✅
+*   **[X]** Modelo de libros con estados (`pendiente`/`leyendo`/`pausado`/`terminado`/`abandonado`), progreso por página, fechas de inicio/fin, motivo de abandono, rating.
+*   **[X]** Campo `applied_insight` prominente — un libro al 100% sin `applied_insight` se marca con aviso ámbar "leído sin aplicar".
+*   **[X]** Filtros por estado (chips con contador), agregar libros fuera del plan original (borrables; los originales protegidos).
+*   **[X]** Migración v1→v2 idempotente: `name: "X · Y"` → `titulo: "X", autor: "Y"`; `started/finished` → `estado`.
+*   **[X]** PDF completo de hitos muestra título, autor, estado, progreso e insight (con "⚠️ leído sin aplicar" si falta).
+*   **[X]** Validación: estados, applied_insight, migración v1→v2 verificada con dump v1 simulado en headless. Mergeado 2026-05-15.
+*   **[~]** Diferido: vínculo automático con bloque "Lectura" via `@id` para evitar parser frágil y doble conteo. Horas se editan a mano en el modal.
 
 ### 1.5.3 · Export multi-formato + incremental — `feat/export-multiformato`
 *   **[ ]** Endpoint `GET /api/export?format={xlsx|csv|json}&from=<iso>&to=<iso>`.
