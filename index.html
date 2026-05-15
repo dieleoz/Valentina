@@ -3986,7 +3986,7 @@ function generarPDF() {
   doc.text(`Bloques con artefacto público: ${bloquesConArt}/${bloquesDone}`, MARGIN + 10, y); y += 12;
   if (bloquesSinArt > 0) {
     doc.setTextColor(197, 80, 75); doc.setFont('helvetica', 'bold');
-    doc.text(`⚠️ ${bloquesSinArt} bloques cerraron SIN artefacto público — revisar con el coach`, MARGIN + 10, y); y += 12;
+    doc.text(`ATENCIÓN: ${bloquesSinArt} bloques cerraron SIN artefacto público — revisar con el coach`, MARGIN + 10, y); y += 12;
     doc.setTextColor(60, 60, 60); doc.setFont('helvetica', 'normal');
   }
   y += 6;
@@ -4009,7 +4009,8 @@ function generarPDF() {
         })())
         .map(m => m.texto).join(' / ') || '—';
       const proximos = (r.milestones || []).filter(m => !m.completado).slice(0, 2).map(m => m.texto).join(' / ') || '—';
-      return [r.emoji + ' ' + r.nombre, p.done + '/' + p.total + ' (' + p.pct + '%)', milestonesSemana, proximos];
+      // PDF: omitimos el emoji (Helvetica no soporta emoji ni banderas)
+      return [r.nombre, p.done + '/' + p.total + ' (' + p.pct + '%)', milestonesSemana, proximos];
     });
     doc.autoTable({
       startY: y,
@@ -4118,7 +4119,7 @@ function generarPDFCompleto() {
     head: [['#', 'Título', 'Autor', 'Estado', 'Progreso', 'Insight aplicado']],
     body: state.libros.map(l => {
       const insight = (l.applied_insight || '').trim();
-      const insightCell = (l.estado === 'terminado' && !insight) ? '⚠️ leído sin aplicar' : (insight || '—');
+      const insightCell = (l.estado === 'terminado' && !insight) ? 'leído sin aplicar (revisar)' : (insight || '—');
       let progreso = '—';
       if (l.paginas_total && l.pagina_actual !== undefined) {
         const pct = Math.min(100, Math.round((l.pagina_actual || 0) / l.paginas_total * 100));
