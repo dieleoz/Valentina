@@ -251,17 +251,131 @@ def _build_tables(state: dict) -> Dict[str, list]:
             {"id": "frances", "nombre": "Francés", "nivel": idiomas_data.get("frances"), "examen_nombre": "TEF",   "examen_score": idiomas_data.get("tef"),   "orden": 1},
         ]
 
-    # 8. meta plan
+    # 8. meses (definición de cada mes del plan: id, nombre, rango de fechas)
+    meses_rows = []
+    for m in state.get("meses") or []:
+        if not isinstance(m, dict):
+            continue
+        meses_rows.append({
+            "id": m.get("id"),
+            "nombre": m.get("nombre"),
+            "desde": m.get("desde"),
+            "hasta": m.get("hasta"),
+            "orden": m.get("orden"),
+        })
+
+    # 9. metas_mensuales (long: una fila por mes × métrica)
+    metas_rows = []
+    metas_data = state.get("metas_mensuales") or {}
+    mes_lookup = {m.get("id"): m for m in (state.get("meses") or []) if isinstance(m, dict)}
+    if isinstance(metas_data, dict):
+        for mes_id in sorted(metas_data.keys()):
+            metas = metas_data[mes_id] or {}
+            if not isinstance(metas, dict):
+                continue
+            mes_info = mes_lookup.get(mes_id) or {}
+            for metrica in sorted(metas.keys()):
+                metas_rows.append({
+                    "mes_id": mes_id,
+                    "mes_nombre": mes_info.get("nombre", mes_id),
+                    "metrica": metrica,
+                    "meta": metas[metrica],
+                })
+
+    # 10. tech_stack (capas L0→Ln)
+    tech_rows = []
+    for l in state.get("tech_stack_layers") or []:
+        if not isinstance(l, dict):
+            continue
+        tech_rows.append({
+            "id": l.get("id"),
+            "orden": l.get("orden"),
+            "codigo": l.get("codigo"),
+            "nombre": l.get("nombre"),
+            "estado": l.get("estado"),
+            "evidencia_url": l.get("evidencia_url"),
+            "notas": l.get("notas"),
+            "fecha_completado": l.get("fecha_completado"),
+        })
+
+    # 11. rutas_carrera (resumen — una fila por ruta con conteo de milestones)
+    # 12. rutas_milestones (detalle long — una fila por (ruta × milestone))
+    rutas_rows = []
+    rutas_milestones_rows = []
+    for r in state.get("rutas_carrera") or []:
+        if not isinstance(r, dict):
+            continue
+        milestones = r.get("milestones") or []
+        total = sum(1 for m in milestones if isinstance(m, dict))
+        done = sum(1 for m in milestones if isinstance(m, dict) and m.get("completado"))
+        pct = round((done / total) * 100) if total else 0
+        rutas_rows.append({
+            "id": r.get("id"),
+            "nombre": r.get("nombre"),
+            "emoji": r.get("emoji"),
+            "estado": r.get("estado"),
+            "fecha_inicio": r.get("fecha_inicio"),
+            "descripcion": r.get("descripcion"),
+            "analisis_estrategico": r.get("analisis"),
+            "milestones_total": total,
+            "milestones_completados": done,
+            "pct": pct,
+        })
+        for m in milestones:
+            if not isinstance(m, dict):
+                continue
+            rutas_milestones_rows.append({
+                "ruta_id": r.get("id"),
+                "ruta_nombre": r.get("nombre"),
+                "milestone_id": m.get("id"),
+                "milestone_texto": m.get("texto"),
+                "completado": bool(m.get("completado")),
+                "fecha_completado": m.get("fecha_completado"),
+                "notas": m.get("notas") or "",
+            })
+
+    # 13. decisiones_historial (filtro 6 verdades)
+    decisiones_rows = []
+    df = state.get("decision_filter") or {}
+    for h in df.get("historial") or []:
+        if not isinstance(h, dict):
+            continue
+        decisiones_rows.append({
+            "fecha": h.get("fecha"),
+            "decision": h.get("decision"),
+            "verdades_aprobadas": h.get("verdades_aprobadas"),
+            "umbral": h.get("umbral"),
+            "resultado": h.get("resultado"),
+        })
+
+    # 14. meta plan (resumen ejecutivo enriquecido con las nuevas features)
     plan = state.get("plan") or {}
+    artefacto_settings = state.get("artefacto_settings") or {}
+    freelance_tier = state.get("freelance_tier") or {}
+    semanas = state.get("semanas") or {}
+    resenas_total = sum(int((s or {}).get("resenas") or 0) for s in semanas.values()) if isinstance(semanas, dict) else 0
     meta_rows = [
         {"campo": "schema_version", "valor": state.get("schema_version", "")},
         {"campo": "plan_nombre", "valor": plan.get("nombre", "")},
         {"campo": "categorias_activas", "valor": sum(1 for c in (plan.get("categorias") or []) if c.get("estado") == "activo")},
         {"campo": "categorias_archivadas", "valor": sum(1 for c in (plan.get("categorias") or []) if c.get("estado") == "archivado")},
         {"campo": "dias_registrados", "valor": len(state.get("dias") or {})},
-        {"campo": "semanas_kpi", "valor": len(state.get("semanas") or {})},
+        {"campo": "semanas_kpi", "valor": len(semanas) if isinstance(semanas, dict) else 0},
         {"campo": "libros_totales", "valor": len(state.get("libros") or [])},
         {"campo": "libros_terminados", "valor": sum(1 for l in (state.get("libros") or []) if l.get("estado") == "terminado")},
+        {"campo": "meses_definidos", "valor": len(state.get("meses") or [])},
+        {"campo": "tech_stack_total", "valor": len(state.get("tech_stack_layers") or [])},
+        {"campo": "tech_stack_completados", "valor": sum(1 for l in (state.get("tech_stack_layers") or []) if l.get("estado") == "completado")},
+        {"campo": "rutas_activas", "valor": sum(1 for r in (state.get("rutas_carrera") or []) if r.get("estado") == "activa")},
+        {"campo": "rutas_pausadas", "valor": sum(1 for r in (state.get("rutas_carrera") or []) if r.get("estado") == "pausada")},
+        {"campo": "rutas_descartadas", "valor": sum(1 for r in (state.get("rutas_carrera") or []) if r.get("estado") == "descartada")},
+        {"campo": "artefacto_categorias_obligatorias", "valor": ", ".join(artefacto_settings.get("categorias_obligatorias") or [])},
+        {"campo": "freelance_tier_actual", "valor": freelance_tier.get("ultimo_tier_visto", "")},
+        {"campo": "freelance_resenas_acumuladas", "valor": resenas_total},
+        {"campo": "freelance_plataformas", "valor": ", ".join(freelance_tier.get("plataformas") or [])},
+        {"campo": "filtro_decision_umbral", "valor": df.get("umbral", "")},
+        {"campo": "filtro_decision_verdades_count", "valor": len(df.get("verdades") or [])},
+        {"campo": "filtro_decision_historial_count", "valor": len(df.get("historial") or [])},
     ]
 
     return {
@@ -273,6 +387,12 @@ def _build_tables(state: dict) -> Dict[str, list]:
         "repos_github": repos_rows,
         "idiomas": idiomas_rows,
         "notas_diarias": notas_rows,
+        "meses": meses_rows,
+        "metas_mensuales": metas_rows,
+        "tech_stack": tech_rows,
+        "rutas_carrera": rutas_rows,
+        "rutas_milestones": rutas_milestones_rows,
+        "decisiones_historial": decisiones_rows,
         "meta_plan": meta_rows,
     }
 

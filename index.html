@@ -420,6 +420,260 @@
     .libro-row { grid-template-columns: 1fr; }
     .libro-actions { justify-content: flex-start; }
   }
+
+  /* ===== FEATURES v2.0 (Plan Maestro) ===== */
+
+  /* FEATURE 1 — Monthly KPI Rollup */
+  .meses-toolbar {
+    display: flex; gap: 8px; align-items: center;
+    flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .meses-toolbar select { width: auto; min-width: 200px; }
+  .progress-bar {
+    background: #EEE;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    position: relative;
+    min-width: 90px;
+  }
+  .progress-bar > div {
+    height: 100%;
+    transition: width 0.3s;
+  }
+  .progress-bar .lbl {
+    position: absolute; inset: 0;
+    text-align: center;
+    font-size: 11px; font-weight: 700;
+    color: #1A1A1A;
+    line-height: 14px;
+  }
+  .pct-green  > div { background: #6FAE5A; }
+  .pct-orange > div { background: #E2A93B; }
+  .pct-red    > div { background: #C5504B; }
+  .veredicto {
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .veredicto.aprobado { background: #D5E8C8; color: #2A4019; border-left: 4px solid #385723; }
+  .veredicto.fallido  { background: #FCE4D6; color: #7A1F1B; border-left: 4px solid #C5504B; }
+  .veredicto.parcial  { background: #FFF2CC; color: #806000; border-left: 4px solid #E2A93B; }
+
+  /* FEATURE 2 — Tech Stack Ladder */
+  .ladder { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .layer-row {
+    display: grid;
+    grid-template-columns: 56px 1fr 110px auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #F5F5F5;
+    border-left: 4px solid #C0C0C0;
+  }
+  .layer-row.layer-en_progreso { background: #FFF8E7; border-left-color: #E2A93B; }
+  .layer-row.layer-completado  { background: #EAF4E2; border-left-color: #385723; }
+  .layer-row .layer-codigo {
+    font-weight: 800; font-size: 18px; color: #1F4E79;
+    text-align: center;
+  }
+  .layer-row .layer-info { min-width: 0; }
+  .layer-row .layer-nombre { font-weight: 600; font-size: 14px; }
+  .layer-row .layer-evidencia { font-size: 12px; color: #595959; margin-top: 2px; word-break: break-all; }
+  .layer-row .layer-evidencia a { color: #1F4E79; }
+  .layer-row select { padding: 6px 8px; font-size: 12px; }
+  .layer-row .layer-actions { display: flex; gap: 4px; }
+  @media (max-width: 720px) {
+    .layer-row { grid-template-columns: 50px 1fr; }
+    .layer-row select, .layer-row .layer-actions {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* FEATURE 4 — Rutas Dinámicas */
+  .ruta-card {
+    background: white;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-left: 4px solid #1F4E79;
+  }
+  .ruta-card.estado-pausada { border-left-color: #E2A93B; opacity: 0.85; }
+  .ruta-card.estado-descartada { border-left-color: #999; opacity: 0.6; }
+  .ruta-card.estado-descartada .ruta-titulo { text-decoration: line-through; }
+  .ruta-header {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .ruta-emoji { font-size: 22px; }
+  .ruta-titulo { flex: 1; font-weight: 700; font-size: 16px; color: #1F4E79; min-width: 140px; }
+  .ruta-titulo .estado-pill {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: #D9E2F3; color: #1F4E79;
+    border-radius: 10px; font-size: 11px;
+    font-weight: 600; vertical-align: middle;
+  }
+  .ruta-card.estado-pausada .estado-pill { background: #FFF2CC; color: #806000; }
+  .ruta-card.estado-descartada .estado-pill { background: #E8E8E8; color: #595959; }
+  .ruta-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ruta-actions .btn-mini {
+    background: transparent; border: 1px solid #C0C0C0;
+    color: #1F4E79; padding: 4px 9px;
+    border-radius: 4px; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+  .ruta-actions .btn-mini:hover { background: #F0F4FA; border-color: #1F4E79; }
+  .ruta-actions .btn-mini.danger { color: #C5504B; }
+  .ruta-actions .btn-mini.danger:hover { background: #FBEAE8; border-color: #C5504B; }
+  .ruta-progreso { font-size: 12px; color: #595959; margin: 4px 0 8px; }
+  .ruta-milestones { margin-top: 6px; }
+  .milestone-row {
+    display: grid;
+    grid-template-columns: 22px 1fr auto auto;
+    gap: 8px; align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dotted #EEE;
+    font-size: 13px;
+  }
+  .milestone-row.mdone .mtxt { text-decoration: line-through; color: #888; }
+  .milestone-row .mfecha { font-size: 11px; color: #999; }
+  .ruta-analisis {
+    margin-top: 8px;
+    background: #F5F5F5;
+    padding: 8px 12px;
+    border-left: 3px solid #1F4E79;
+    border-radius: 0 4px 4px 0;
+    font-size: 13px; color: #404040;
+  }
+  .ruta-analisis details summary {
+    cursor: pointer; font-weight: 600;
+    color: #1F4E79; user-select: none;
+  }
+  .ruta-analisis textarea { margin-top: 6px; min-height: 70px; }
+  .rutas-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin-bottom: 12px;
+  }
+  .rutas-summary .kpi-card { border-left-color: #7030A0; }
+  .rutas-summary .kpi-card .value { color: #7030A0; }
+
+  /* FEATURE 3 — Artefacto público */
+  .artefacto-row {
+    margin: 6px 0 12px;
+    padding: 8px 10px;
+    background: #FAFAFA;
+    border-left: 3px solid #4F81BD;
+    border-radius: 0 4px 4px 0;
+  }
+  .artefacto-row.sin-artefacto {
+    background: #FFF6E5;
+    border-left-color: #E2A93B;
+  }
+  .artefacto-row .label { font-size: 12px; font-weight: 600; color: #404040; margin-bottom: 4px; }
+  .artefacto-row input[type="text"] { padding: 6px 8px; font-size: 12px; }
+  .artefacto-tipos { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .artefacto-tipos .tipo-chip {
+    padding: 3px 8px;
+    background: #E8E8E8;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    color: #595959;
+    user-select: none;
+  }
+  .artefacto-tipos .tipo-chip.active {
+    background: #1F4E79; color: white; border-color: #1F4E79;
+  }
+  .artefacto-tipos .tipo-chip[data-tipo="ninguno"].active {
+    background: #C5504B; border-color: #C5504B;
+  }
+  .block-row.sin-artefacto-block {
+    box-shadow: inset 3px 0 0 #E2A93B;
+  }
+
+  /* FEATURE 5 — Freelance Tier Badge */
+  .tier-badge-card {
+    display: flex; align-items: center; gap: 14px;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #DDD;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+  .tier-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    min-width: 90px;
+  }
+  .tier-1 { background: #E8E8E8; color: #595959; }
+  .tier-2 { background: #D9E2F3; color: #1F4E79; }
+  .tier-3 { background: #FFE9B0; color: #806000; box-shadow: 0 0 0 2px #E2A93B inset; }
+  .tier-info .small { color: #595959; }
+  .tier-info strong { color: #1A1A1A; }
+
+  /* FEATURE 6 — Filtro 6 Verdades */
+  .fab-filter {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    width: 52px; height: 52px;
+    border-radius: 26px;
+    background: #1F4E79;
+    color: white;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 90;
+  }
+  .fab-filter:hover { background: #16385A; }
+  .verdad-row {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 10px; align-items: start;
+    padding: 8px 0;
+    border-bottom: 1px solid #EEE;
+  }
+  .verdad-row input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; }
+  .verdad-row label { font-size: 13px; cursor: pointer; }
+  .filtro-result {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+  }
+  .filtro-result.ejecutar { background: #D5E8C8; color: #2A4019; border-left: 4px solid #385723; }
+  .filtro-result.no { background: #FCE4D6; color: #7A1F1B; border-left: 4px solid #C5504B; }
+  .filtro-result.cautela { background: #FFF2CC; color: #806000; border-left: 4px solid #E2A93B; }
+  .historial-decision {
+    padding: 10px 12px;
+    border-bottom: 1px solid #EEE;
+    font-size: 13px;
+  }
+  .historial-decision .meta {
+    font-size: 11px; color: #999; margin-top: 2px;
+  }
+  .historial-decision .resultado {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px; font-weight: 700;
+  }
 </style>
 </head>
 <body>
@@ -432,6 +686,7 @@
 <nav class="tabs">
   <button data-tab="hoy" class="active">Hoy</button>
   <button data-tab="semana">Semana</button>
+  <button data-tab="mes">Mes</button>
   <button data-tab="hitos">Hitos</button>
   <button data-tab="reporte">Reporte PDF</button>
   <button data-tab="datos">Datos</button>
@@ -536,7 +791,15 @@
         <input type="number" id="kpi-tarifa" min="0" step="0.5" onchange="guardarSemana()">
         <div class="small">Mes 1: $5-8 · Mes 6: $15-25</div>
       </div>
+      <div>
+        <label>Reseñas recibidas esta semana</label>
+        <input type="number" id="kpi-resenas" min="0" onchange="guardarSemana();renderTierBadge();">
+        <div class="small">Suben tu Tier de freelancer</div>
+      </div>
     </div>
+
+    <!-- FEATURE 5 — Freelance Tier Badge -->
+    <div id="tier-badge-container"></div>
 
     <h3>Visibilidad técnica</h3>
     <div class="grid-3">
@@ -582,8 +845,50 @@
   </div>
 </section>
 
+<!-- ============= TAB MES (FEATURE 1 — Monthly KPI Rollup) ============= -->
+<section id="tab-mes" class="tab-content">
+  <div class="card">
+    <h2>📅 Auditoría mensual</h2>
+    <div class="info-box">El plan tiene metas mensuales. Esta vista suma las semanas dentro del rango del mes seleccionado y compara contra la meta. Verde ≥ 70%, naranja 40-69%, rojo &lt; 40%. <strong>Las metas y los rangos son editables</strong> — si el plan cambia, ajustá acá sin tocar código.</div>
+
+    <div class="meses-toolbar">
+      <select id="mes-selector" onchange="cargarMes()"></select>
+      <button class="btn secondary" onclick="abrirModalMes(null)">＋ Nuevo mes</button>
+      <button class="btn secondary" id="btn-editar-mes" onclick="abrirModalMes(_mesActualId)">✎ Editar mes</button>
+      <button class="btn secondary" onclick="abrirModalMetas()">🎯 Editar metas</button>
+    </div>
+
+    <div id="mes-rango-info" class="small" style="margin-bottom:10px"></div>
+
+    <div id="mes-tabla-wrap"></div>
+
+    <div id="mes-veredicto"></div>
+  </div>
+</section>
+
 <!-- ============= TAB HITOS ============= -->
 <section id="tab-hitos" class="tab-content">
+  <!-- FEATURE 4 — Route Progress Panel (Rutas Dinámicas) -->
+  <div class="card">
+    <div class="biblioteca-header">
+      <h2>🗺️ Rutas de Carrera</h2>
+      <button class="btn" onclick="abrirModalRuta(null)">＋ Nueva Ruta</button>
+    </div>
+    <div class="info-box">Las rutas son <strong>tu mapa actual, no un destino fijo</strong>. Creá, pausá o descartá las que dejen de tener sentido. El historial de rutas intentadas es tan valioso como las completadas — guardalo, no lo borres.</div>
+    <div id="rutas-summary" class="rutas-summary"></div>
+    <div id="rutas-container"></div>
+  </div>
+
+  <!-- FEATURE 2 — Tech Stack Ladder -->
+  <div class="card">
+    <div class="biblioteca-header">
+      <h2>🧬 Tech Stack Ladder</h2>
+      <button class="btn" onclick="abrirModalLayer(null)">＋ Nueva Capa</button>
+    </div>
+    <div class="info-box">Capas tecnológicas en el orden que las planeás aprender. Para marcar una capa como <strong>Completada</strong> tenés que pegar URL pública (repo / cert / proyecto). Si tu path cambia, edita o reordena las capas — el Plan sugiere L0→L6 AI-Bio, pero vos definís el stack.</div>
+    <div id="ladder-container" class="ladder"></div>
+  </div>
+
   <div class="card">
     <h2>📜 Certificaciones (precargadas del Plan Maestro)</h2>
     <div class="info-box">Marca completada cuando subiste el certificado a LinkedIn. La URL es donde está el certificado público. Sin URL pública, no cuenta.</div>
@@ -662,6 +967,29 @@
 
 <!-- ============= TAB DATOS ============= -->
 <section id="tab-datos" class="tab-content">
+  <!-- FEATURE 6 — Filtro 6 Verdades -->
+  <div class="card">
+    <div class="biblioteca-header">
+      <h2>⚖️ Filtro de Decisión (6 Verdades)</h2>
+      <button class="btn secondary" onclick="abrirModalConfigFiltro()">⚙ Configurar verdades</button>
+    </div>
+    <div class="info-box">Cada vez que dudes si tomar un curso, postular a algo o gastar dinero, pasá la decisión por estos filtros. Las verdades son <strong>editables</strong> — si tu path cambia, ajustá la verdad #6.</div>
+
+    <div class="form-row">
+      <label>¿Qué decisión estás evaluando?</label>
+      <input type="text" id="filtro-decision-texto" placeholder="Ej: ¿Tomo el diplomado de $3,000 MXN?" maxlength="200">
+    </div>
+    <div id="filtro-verdades-list"></div>
+    <div style="margin-top:14px;">
+      <button class="btn success" onclick="evaluarDecision()">Evaluar decisión</button>
+      <button class="btn secondary" onclick="resetFiltro()">Limpiar</button>
+    </div>
+    <div id="filtro-resultado-wrap"></div>
+
+    <h3>Historial de decisiones (últimas 20)</h3>
+    <div id="filtro-historial"></div>
+  </div>
+
   <div class="card">
     <h2>Exportar datos (XLSX / CSV / JSON)</h2>
     <div class="info-box">El PDF semanal sigue siendo el formato del coach. <strong>Excel</strong> y <strong>CSV</strong> son para análisis y backup real — abren en Sheets, LibreOffice y Excel. <strong>JSON</strong> es bit-exact reimportable.<br>El rango es opcional: dejá ambos vacíos para descargar todo. <strong>"Desde"</strong> activa el modo incremental (solo lo nuevo desde esa fecha).</div>
@@ -808,6 +1136,170 @@
   </div>
 </div>
 
+<!-- ===== Modal Mes (FEATURE 1) ===== -->
+<div class="modal-overlay" id="mes-modal" onclick="if(event.target===this)cerrarModalMes()">
+  <div class="modal">
+    <h2 id="mes-modal-title">Nuevo mes</h2>
+    <input type="hidden" id="mes-modal-id">
+    <div class="form-row">
+      <label>Nombre del mes *</label>
+      <input type="text" id="mes-modal-nombre" placeholder="Ej: Mes 1, Mes 2…" maxlength="40">
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Desde</label>
+        <input type="date" id="mes-modal-desde">
+      </div>
+      <div class="form-row">
+        <label>Hasta</label>
+        <input type="date" id="mes-modal-hasta">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalMes()">Cancelar</button>
+      <button class="btn danger" id="mes-modal-borrar" style="margin-right:auto" onclick="borrarMesDesdeModal()">🗑 Borrar</button>
+      <button class="btn success" onclick="guardarMesModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal Metas Mensuales (FEATURE 1) ===== -->
+<div class="modal-overlay" id="metas-modal" onclick="if(event.target===this)cerrarModalMetas()">
+  <div class="modal">
+    <h2 id="metas-modal-title">Editar metas del mes</h2>
+    <div class="info-box">Si tu plan acelera o se ralentiza, ajustá las metas. Aplican solo al mes seleccionado.</div>
+    <div class="grid-2">
+      <div class="form-row"><label>Certificaciones publicadas</label><input type="number" id="meta-certs" min="0"></div>
+      <div class="form-row"><label>Postulaciones formales</label><input type="number" id="meta-postulaciones" min="0"></div>
+      <div class="form-row"><label>Entrevistas reales</label><input type="number" id="meta-entrevistas" min="0"></div>
+      <div class="form-row"><label>Ingreso freelance USD</label><input type="number" id="meta-freelance" min="0" step="1"></div>
+      <div class="form-row"><label>Repos GitHub publicados</label><input type="number" id="meta-repos" min="0"></div>
+      <div class="form-row"><label>Conexiones LinkedIn</label><input type="number" id="meta-conexiones" min="0"></div>
+      <div class="form-row"><label>Posts técnicos en inglés</label><input type="number" id="meta-posts" min="0"></div>
+      <div class="form-row"><label>Proyectos freelance</label><input type="number" id="meta-proyectos" min="0"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalMetas()">Cancelar</button>
+      <button class="btn success" onclick="guardarMetasModal()">💾 Guardar metas</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal Layer Tech Stack (FEATURE 2) ===== -->
+<div class="modal-overlay" id="layer-modal" onclick="if(event.target===this)cerrarModalLayer()">
+  <div class="modal">
+    <h2 id="layer-modal-title">Nueva capa</h2>
+    <input type="hidden" id="layer-modal-id">
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Código (L0, L1, R, etc.)</label>
+        <input type="text" id="layer-modal-codigo" maxlength="6" placeholder="L0">
+      </div>
+      <div class="form-row">
+        <label>Estado</label>
+        <select id="layer-modal-estado">
+          <option value="no_iniciado">○ No iniciado</option>
+          <option value="en_progreso">● En progreso</option>
+          <option value="completado">✓ Completado</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Nombre / descripción *</label>
+      <input type="text" id="layer-modal-nombre" placeholder="Ej: Python (Pandas, NumPy) + Git" maxlength="120">
+    </div>
+    <div class="form-row">
+      <label>URL evidencia pública (obligatoria si Completado)</label>
+      <input type="text" id="layer-modal-url" placeholder="https://github.com/... o cert URL">
+    </div>
+    <div class="form-row">
+      <label>Notas</label>
+      <textarea id="layer-modal-notas" placeholder="Cursos, libros, qué hiciste exactamente"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalLayer()">Cancelar</button>
+      <button class="btn danger" id="layer-modal-borrar" style="margin-right:auto" onclick="borrarLayerDesdeModal()">🗑 Borrar</button>
+      <button class="btn success" onclick="guardarLayerModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal Ruta (FEATURE 4) ===== -->
+<div class="modal-overlay" id="ruta-modal" onclick="if(event.target===this)cerrarModalRuta()">
+  <div class="modal">
+    <h2 id="ruta-modal-title">Nueva Ruta</h2>
+    <input type="hidden" id="ruta-modal-id">
+    <div class="form-row">
+      <label>Nombre de la ruta *</label>
+      <input type="text" id="ruta-modal-nombre" placeholder="Ej: Canadá – Express Entry" maxlength="80">
+    </div>
+    <div class="form-row">
+      <label>Emoji / ícono</label>
+      <div id="ruta-modal-emojis" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <div class="form-row">
+      <label>Estado</label>
+      <select id="ruta-modal-estado">
+        <option value="activa">🟢 Activa</option>
+        <option value="pausada">⏸ Pausada / en evaluación</option>
+        <option value="descartada">✕ Descartada</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Descripción breve</label>
+      <textarea id="ruta-modal-descripcion" placeholder="¿Por qué tiene sentido esta ruta?"></textarea>
+    </div>
+    <div class="form-row">
+      <label>🧠 Análisis estratégico (Career Architect)</label>
+      <textarea id="ruta-modal-analisis" placeholder="Razonamiento del coach: por qué tu perfil encaja, plazos, riesgos…"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalRuta()">Cancelar</button>
+      <button class="btn danger" id="ruta-modal-borrar" style="margin-right:auto" onclick="borrarRutaDesdeModal()">🗑 Eliminar</button>
+      <button class="btn success" onclick="guardarRutaModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal Milestone Ruta (FEATURE 4) ===== -->
+<div class="modal-overlay" id="milestone-modal" onclick="if(event.target===this)cerrarModalMilestone()">
+  <div class="modal">
+    <h2 id="milestone-modal-title">Nuevo milestone</h2>
+    <input type="hidden" id="milestone-modal-ruta-id">
+    <input type="hidden" id="milestone-modal-id">
+    <div class="form-row">
+      <label>Texto del milestone *</label>
+      <input type="text" id="milestone-modal-texto" placeholder="Ej: IELTS Academic ≥ 7.5" maxlength="160">
+    </div>
+    <div class="form-row">
+      <label>Notas</label>
+      <textarea id="milestone-modal-notas" placeholder="Detalles, deadline esperado…"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalMilestone()">Cancelar</button>
+      <button class="btn danger" id="milestone-modal-borrar" style="margin-right:auto" onclick="borrarMilestoneDesdeModal()">🗑 Eliminar</button>
+      <button class="btn success" onclick="guardarMilestoneModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal Configurar Filtro (FEATURE 6) ===== -->
+<div class="modal-overlay" id="filtro-config-modal" onclick="if(event.target===this)cerrarModalConfigFiltro()">
+  <div class="modal">
+    <h2>Configurar Filtro de Decisión</h2>
+    <div class="info-box">Editá las 6 verdades para que reflejen tu path actual. La verdad #6 suele ser la que cambia (ej: "AI-Bio" → "regulatory affairs" → "tu nuevo enfoque").</div>
+    <div id="config-verdades-list"></div>
+    <div class="form-row" style="margin-top:14px;">
+      <label>Umbral mínimo para "EJECUTAR" (0–N)</label>
+      <input type="number" id="config-umbral" min="0" max="20" step="1">
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalConfigFiltro()">Cancelar</button>
+      <button class="btn success" onclick="guardarConfigFiltro()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal agregar/editar categoría -->
 <div class="modal-overlay" id="categoria-modal" onclick="if(event.target===this)cerrarModalCategoria()">
   <div class="modal">
@@ -837,6 +1329,9 @@
     </div>
   </div>
 </div>
+
+<!-- FEATURE 6 — botón flotante para abrir el filtro desde cualquier tab -->
+<button class="fab-filter" title="Filtro 6 Verdades" onclick="abrirFiltroDesdeFab()">⚖️</button>
 
 <div id="toast" class="toast"></div>
 
@@ -1030,6 +1525,121 @@ function migrarLibro(l) {
   };
 }
 
+// ===== FEATURE 1 — Defaults para meses + metas =====
+function buildDefaultMeses() {
+  return [
+    { id: 'm1', nombre: 'Mes 1', desde: '', hasta: '', orden: 1 },
+    { id: 'm2', nombre: 'Mes 2', desde: '', hasta: '', orden: 2 },
+    { id: 'm3', nombre: 'Mes 3', desde: '', hasta: '', orden: 3 },
+    { id: 'm6', nombre: 'Mes 6', desde: '', hasta: '', orden: 6 }
+  ];
+}
+function buildDefaultMetasMensuales() {
+  return {
+    m1: { certs: 2, postulaciones: 20, entrevistas: 1, freelance: 200, repos: 0, conexiones: 30, posts: 4, proyectos: 4 },
+    m2: { certs: 4, postulaciones: 40, entrevistas: 3, freelance: 500, repos: 1, conexiones: 80, posts: 8, proyectos: 8 },
+    m3: { certs: 6, postulaciones: 60, entrevistas: 5, freelance: 800, repos: 1, conexiones: 150, posts: 12, proyectos: 12 },
+    m6: { certs: 7, postulaciones: 120, entrevistas: 12, freelance: 1500, repos: 2, conexiones: 400, posts: 24, proyectos: 24 }
+  };
+}
+
+// ===== FEATURE 2 — Defaults para Tech Stack Ladder =====
+function buildDefaultLayers() {
+  return [
+    { id: 'l0', orden: 0, codigo: 'L0', nombre: 'Python (Pandas, NumPy, Matplotlib) + Git', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null },
+    { id: 'l1', orden: 1, codigo: 'L1', nombre: 'R + Biostatistics', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null },
+    { id: 'l2', orden: 2, codigo: 'L2', nombre: 'SQL', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null },
+    { id: 'l3', orden: 3, codigo: 'L3', nombre: 'Bioinformática (Biopython, BLAST, NGS)', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null },
+    { id: 'l4', orden: 4, codigo: 'L4', nombre: 'Machine Learning + scikit-learn', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null },
+    { id: 'l5', orden: 5, codigo: 'L5', nombre: 'Deep Learning + PyTorch', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null },
+    { id: 'l6', orden: 6, codigo: 'L6', nombre: 'Bio-ML (AlphaFold, ESM, RDKit)', estado: 'no_iniciado', evidencia_url: '', notas: '', fecha_completado: null }
+  ];
+}
+
+// ===== FEATURE 3 — Settings de artefacto público =====
+function buildDefaultArtefactoSettings() {
+  // Categorías que requieren artefacto público al cerrar el bloque
+  return { categorias_obligatorias: ['ingles', 'tech', 'certs', 'freelance'] };
+}
+
+// ===== FEATURE 4 — Defaults para Rutas dinámicas =====
+function buildDefaultRutas() {
+  const hoy = fechaHoy();
+  const mid = (n) => 'r' + n + '-' + Date.now().toString(36).slice(-4);
+  return [
+    {
+      id: 'ruta-mx', nombre: 'México Local', emoji: '🏭', estado: 'activa',
+      fecha_inicio: hoy,
+      descripcion: 'Empleo formal en MX mientras se construye el perfil internacional.',
+      analisis: 'Path inicial pragmático: ingreso estable + experiencia formal mientras se acumulan certificaciones, repos GitHub y horas de inglés. Permite financiar las otras rutas sin presión.',
+      milestones: [
+        { id: mid(1), texto: '7 certificaciones MX publicadas en LinkedIn', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(2), texto: 'Primer empleo formal conseguido', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(3), texto: 'Salario ≥ $15,000 MXN/mes', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(4), texto: '6 meses de permanencia en empresa', completado: false, fecha_completado: null, notas: '' }
+      ]
+    },
+    {
+      id: 'ruta-ca', nombre: 'Canadá – Express Entry', emoji: '🍁', estado: 'activa',
+      fecha_inicio: hoy,
+      descripcion: 'Vía migratoria a través de inglés + francés + perfil científico.',
+      analisis: 'Tu B2 de inglés + perfil científico + edad <30 da puntaje base alto. Sumando francés intermedio y ECA llegás a invitación en 12-18 meses. Riesgo: el francés requiere disciplina diaria sostenida.',
+      milestones: [
+        { id: mid(5), texto: 'IELTS Academic ≥ 7.5 (CLB 9)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(6), texto: 'TEF Canada ≥ B2 (NCLC 7)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(7), texto: 'ECA solicitado', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(8), texto: 'ECA recibido', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(9), texto: 'Perfil Express Entry creado', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(10), texto: 'Invitación a aplicar (ITA) recibida', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(11), texto: 'PR aprobado', completado: false, fecha_completado: null, notas: '' }
+      ]
+    },
+    {
+      id: 'ruta-aibio', nombre: 'AI-Bio Path', emoji: '🔬', estado: 'activa',
+      fecha_inicio: hoy,
+      descripcion: 'Camino técnico hacia roles de Research Associate / Bio-ML.',
+      analisis: 'Diferenciador real frente a otros biotecnólogos. Compounding asimétrico: cada repo aumenta la probabilidad del próximo. Path largo (18+ meses) pero con artefactos públicos visibles desde mes 4.',
+      milestones: [
+        { id: mid(12), texto: 'L0 completado (Python + Git)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(13), texto: 'Repo 1 publicado (análisis estadístico)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(14), texto: 'Repo 2 publicado (clasificador ML)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(15), texto: 'Repo 3 publicado (Biopython)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(16), texto: 'Repo 4 publicado (ESMFold)', completado: false, fecha_completado: null, notas: '' },
+        { id: mid(17), texto: 'Primera aplicación a Research Associate role', completado: false, fecha_completado: null, notas: '' }
+      ]
+    }
+  ];
+}
+
+// ===== FEATURE 5 — Defaults Freelance Tier =====
+function buildDefaultFreelanceTier() {
+  return {
+    tiers: [
+      { nombre: 'Tier 1', clase: 'tier-1', desde: 0,  hasta: 4 },
+      { nombre: 'Tier 2', clase: 'tier-2', desde: 5,  hasta: 9 },
+      { nombre: 'Tier 3', clase: 'tier-3', desde: 10, hasta: null }
+    ],
+    ultimo_tier_visto: 'Tier 1',
+    plataformas: ['Upwork', 'Preply', 'Kolabtree']
+  };
+}
+
+// ===== FEATURE 6 — Defaults Filtro de Decisión =====
+function buildDefaultDecisionFilter() {
+  return {
+    verdades: [
+      '¿Produce un artefacto público?',
+      '¿Me acerca a una empresa que me contrate y en qué país?',
+      '¿Está en una vacante real que aplica esta semana?',
+      '¿Genera dinero ahora o en el corto plazo?',
+      '¿Está en inglés o potencia mi inglés?',
+      '¿Suma al path tecnológico actual?'
+    ],
+    umbral: 4,
+    historial: []
+  };
+}
+
 function defaultState() {
   return {
     schema_version: 2,
@@ -1039,7 +1649,15 @@ function defaultState() {
     certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
     repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
     libros: buildDefaultLibros(),
-    idiomas: buildDefaultIdiomas()
+    idiomas: buildDefaultIdiomas(),
+    // FEATURES v2.0
+    meses: buildDefaultMeses(),
+    metas_mensuales: buildDefaultMetasMensuales(),
+    tech_stack_layers: buildDefaultLayers(),
+    artefacto_settings: buildDefaultArtefactoSettings(),
+    rutas_carrera: buildDefaultRutas(),
+    freelance_tier: buildDefaultFreelanceTier(),
+    decision_filter: buildDefaultDecisionFilter()
   };
 }
 
@@ -1069,6 +1687,14 @@ async function cargarEstado() {
         if (!s.plan || !Array.isArray(s.plan.categorias)) {
           s.plan = { ...(s.plan || {}), categorias: buildDefaultCategorias() };
         }
+        // Migración v2 → v2.1 (features Plan Maestro)
+        if (!Array.isArray(s.meses) || s.meses.length === 0) s.meses = buildDefaultMeses();
+        if (!s.metas_mensuales || typeof s.metas_mensuales !== 'object') s.metas_mensuales = buildDefaultMetasMensuales();
+        if (!Array.isArray(s.tech_stack_layers) || s.tech_stack_layers.length === 0) s.tech_stack_layers = buildDefaultLayers();
+        if (!s.artefacto_settings) s.artefacto_settings = buildDefaultArtefactoSettings();
+        if (!Array.isArray(s.rutas_carrera) || s.rutas_carrera.length === 0) s.rutas_carrera = buildDefaultRutas();
+        if (!s.freelance_tier || !Array.isArray(s.freelance_tier.tiers)) s.freelance_tier = buildDefaultFreelanceTier();
+        if (!s.decision_filter || !Array.isArray(s.decision_filter.verdades)) s.decision_filter = buildDefaultDecisionFilter();
         s.schema_version = 2;
         state = s;
       }
@@ -1127,10 +1753,11 @@ document.querySelectorAll('nav.tabs button').forEach(btn => {
     document.querySelectorAll('section.tab-content').forEach(s => s.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'semana') renderKpiBoard();
-    if (btn.dataset.tab === 'datos') actualizarStorageInfo();
+    if (btn.dataset.tab === 'semana') { renderKpiBoard(); renderTierBadge(); }
+    if (btn.dataset.tab === 'datos') { actualizarStorageInfo(); renderFiltroVerdades(); renderHistorialDecisiones(); }
     if (btn.dataset.tab === 'hitos') renderHitos();
     if (btn.dataset.tab === 'hoy') renderResumen7Dias();
+    if (btn.dataset.tab === 'mes') renderMesUI();
   });
 });
 
@@ -1155,8 +1782,10 @@ function renderBloques(diaData) {
 
   activas.forEach(cat => {
     const data = (diaData?.bloques?.[cat.id]) || { done: false, hours: 0, what: '' };
+    const exigeArtefacto = categoriaExigeArtefacto(cat.id);
+    const sinArt = exigeArtefacto && data.done && data.sin_artefacto === true;
     const div = document.createElement('div');
-    div.className = 'block-row';
+    div.className = 'block-row' + (sinArt ? ' sin-artefacto-block' : '');
     div.innerHTML = `
       <input type="checkbox" data-bloque="${cat.id}" data-field="done" ${data.done ? 'checked' : ''}>
       <div class="block-name">
@@ -1171,6 +1800,32 @@ function renderBloques(diaData) {
       </div>
     `;
     c.appendChild(div);
+    // FEATURE 3 — Artefacto público (solo categorías obligatorias)
+    if (exigeArtefacto) {
+      const tipo = data.artefacto_tipo || '';
+      const url  = data.artefacto_url || '';
+      const just = data.artefacto_justificacion || '';
+      const tipos = ['github','linkedin','cert','sesion','freelance','ninguno'];
+      const tipoLabels = {
+        github: 'GitHub commit', linkedin: 'Post LinkedIn', cert: 'Certificado',
+        sesion: 'Clase / sesión', freelance: 'Entrega freelance', ninguno: 'Ninguno'
+      };
+      const arWrap = document.createElement('div');
+      arWrap.className = 'artefacto-row' + (sinArt ? ' sin-artefacto' : '');
+      arWrap.dataset.artefactoBloque = cat.id;
+      arWrap.innerHTML = `
+        <div class="label">🔗 Artefacto público producido (${escapeHtml(cat.nombre)})</div>
+        <input type="text" data-art="${cat.id}" data-art-field="url" placeholder="URL o descripción corta del artefacto producido hoy" value="${escapeAttr(url)}">
+        <div class="artefacto-tipos">
+          ${tipos.map(t => `<span class="tipo-chip ${tipo===t?'active':''}" data-tipo="${t}" onclick="setArtefactoTipo('${cat.id}','${t}')">${tipoLabels[t]}</span>`).join('')}
+        </div>
+        <div data-art-justif-wrap="${cat.id}" style="margin-top:6px;${tipo==='ninguno'?'':'display:none;'}">
+          <label class="small" style="font-size:11px">Justificación (mín 20 caracteres) si elegiste "Ninguno":</label>
+          <input type="text" data-art="${cat.id}" data-art-field="justificacion" placeholder="¿Por qué no hubo artefacto hoy?" value="${escapeAttr(just)}">
+        </div>
+      `;
+      c.appendChild(arWrap);
+    }
   });
 
   renderArchivadas();
@@ -1217,13 +1872,52 @@ function leerBloquesUI() {
   getCategoriasActivas().forEach(cat => {
     const doneEl = document.querySelector(`[data-bloque="${cat.id}"][data-field="done"]`);
     if (!doneEl) return;
-    result[cat.id] = {
+    const bloqueData = {
       done: doneEl.checked,
       hours: parseFloat(document.querySelector(`[data-bloque="${cat.id}"][data-field="hours"]`).value) || 0,
       what:  document.querySelector(`[data-bloque="${cat.id}"][data-field="what"]`).value
     };
+    // FEATURE 3 — Leer artefacto si la categoría lo exige
+    if (categoriaExigeArtefacto(cat.id)) {
+      const artUrlEl = document.querySelector(`[data-art="${cat.id}"][data-art-field="url"]`);
+      const artJustEl = document.querySelector(`[data-art="${cat.id}"][data-art-field="justificacion"]`);
+      const tipo = document.querySelector(`[data-artefacto-bloque="${cat.id}"] .tipo-chip.active`)?.dataset.tipo || '';
+      const url = artUrlEl?.value.trim() || '';
+      const just = artJustEl?.value.trim() || '';
+      bloqueData.artefacto_tipo = tipo;
+      bloqueData.artefacto_url = url;
+      bloqueData.artefacto_justificacion = just;
+      // Marca "sin artefacto" si bloque está hecho pero no produjo nada
+      const tieneEvidencia = (tipo && tipo !== 'ninguno' && url) || (tipo && tipo !== 'ninguno' && url === '' && bloqueData.what);
+      if (bloqueData.done) {
+        if (tipo === 'ninguno' || (!tipo && !url)) {
+          bloqueData.sin_artefacto = true;
+        } else {
+          bloqueData.sin_artefacto = !tieneEvidencia && !url;
+        }
+      } else {
+        bloqueData.sin_artefacto = false;
+      }
+    }
+    result[cat.id] = bloqueData;
   });
   return result;
+}
+
+// FEATURE 3 — helpers artefacto
+function categoriaExigeArtefacto(catId) {
+  const set = state.artefacto_settings?.categorias_obligatorias || [];
+  return set.includes(catId);
+}
+
+function setArtefactoTipo(catId, tipo) {
+  const wrap = document.querySelector(`[data-artefacto-bloque="${catId}"]`);
+  if (!wrap) return;
+  wrap.querySelectorAll('.tipo-chip').forEach(ch => {
+    ch.classList.toggle('active', ch.dataset.tipo === tipo);
+  });
+  const justifWrap = document.querySelector(`[data-art-justif-wrap="${catId}"]`);
+  if (justifWrap) justifWrap.style.display = (tipo === 'ninguno') ? '' : 'none';
 }
 
 // ============= CRUD CATEGORÍAS =============
@@ -1769,13 +2463,27 @@ document.getElementById('hoy-fecha').addEventListener('change', e => cargarDia(e
 function guardarDia() {
   const fecha = document.getElementById('hoy-fecha').value;
   if (!fecha) { toast('Selecciona una fecha', false); return; }
+  const bloques = leerBloquesUI();
+  // FEATURE 3 — validar justificación cuando tipo = "ninguno"
+  for (const id in bloques) {
+    const b = bloques[id];
+    if (b.done && categoriaExigeArtefacto(id) && b.artefacto_tipo === 'ninguno') {
+      if ((b.artefacto_justificacion || '').length < 20) {
+        const cat = getCategoriaById(id);
+        toast(`"${cat?.nombre || id}": justificación de "Ninguno" debe tener mínimo 20 caracteres`, false);
+        return;
+      }
+    }
+  }
   state.dias[fecha] = {
-    bloques: leerBloquesUI(),
+    bloques,
     wins: document.getElementById('hoy-wins').value,
     blockers: document.getElementById('hoy-blockers').value,
     savedAt: new Date().toISOString()
   };
   guardar();
+  // refrescar UI con flags sin_artefacto actualizados
+  renderBloques(state.dias[fecha]);
   toast('Día guardado: ' + fecha);
   renderResumen7Dias();
 }
@@ -1848,6 +2556,7 @@ function cargarSemana() {
   document.getElementById('kpi-freelance').value     = data.freelance || 0;
   document.getElementById('kpi-proyectos').value     = data.proyectos || 0;
   document.getElementById('kpi-tarifa').value        = data.tarifa || 0;
+  document.getElementById('kpi-resenas').value       = data.resenas || 0;
   document.getElementById('kpi-posts').value         = data.posts || 0;
   document.getElementById('kpi-commits').value       = data.commits || 0;
   document.getElementById('kpi-certs').value         = data.certs || 0;
@@ -1855,6 +2564,7 @@ function cargarSemana() {
   document.getElementById('kpi-preguntas').value     = data.preguntas || '';
   document.getElementById('kpi-plan').value          = data.plan || '';
   renderKpiBoard();
+  renderTierBadge();
 }
 
 function guardarSemana(showToast = false) {
@@ -1865,6 +2575,7 @@ function guardarSemana(showToast = false) {
     freelance:     +document.getElementById('kpi-freelance').value || 0,
     proyectos:     +document.getElementById('kpi-proyectos').value || 0,
     tarifa:        +document.getElementById('kpi-tarifa').value || 0,
+    resenas:       +document.getElementById('kpi-resenas').value || 0,
     posts:         +document.getElementById('kpi-posts').value || 0,
     commits:       +document.getElementById('kpi-commits').value || 0,
     certs:         +document.getElementById('kpi-certs').value || 0,
@@ -1978,6 +2689,10 @@ function renderHitos() {
 
   // Idiomas — render delegado
   renderIdiomas();
+
+  // FEATURE 2 + 4 — Tech Stack Ladder y Rutas dinámicas
+  renderRutas();
+  renderLadder();
 }
 
 // (Compat) guardarHitos sigue existiendo para hitos no-idiomas si alguien lo invoca
@@ -2227,6 +2942,853 @@ function actualizarStorageInfo() {
   `;
 }
 
+// =====================================================
+// ============= FEATURE 1 — MONTHLY KPI ROLLUP =========
+// =====================================================
+let _mesActualId = null;
+
+function getMeses() {
+  if (!Array.isArray(state.meses)) state.meses = buildDefaultMeses();
+  return state.meses.slice().sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+}
+
+function getMesById(id) {
+  return (state.meses || []).find(m => m.id === id) || null;
+}
+
+function getMetasMes(mesId) {
+  return (state.metas_mensuales || {})[mesId] || {};
+}
+
+function semanasEnMes(mes) {
+  // Devuelve los datos semanales cuyo lunes cae en el rango [desde, hasta]
+  if (!mes?.desde || !mes?.hasta) return [];
+  const out = [];
+  for (const lunes in (state.semanas || {})) {
+    if (lunes >= mes.desde && lunes <= mes.hasta) out.push(state.semanas[lunes]);
+  }
+  return out;
+}
+
+function sumarKPIsSemanas(semanas) {
+  const acc = {
+    postulaciones: 0, entrevistas: 0, conexiones: 0, freelance: 0,
+    proyectos: 0, posts: 0, commits: 0, certs: 0, resenas: 0
+  };
+  semanas.forEach(s => {
+    Object.keys(acc).forEach(k => { acc[k] += +s[k] || 0; });
+  });
+  return acc;
+}
+
+function reposPublicadosEnRango(desde, hasta) {
+  if (!desde || !hasta) return 0;
+  return (state.repos || []).filter(r =>
+    r.done && r.doneDate && r.doneDate >= desde && r.doneDate <= hasta
+  ).length;
+}
+
+function renderMesUI() {
+  const sel = document.getElementById('mes-selector');
+  const meses = getMeses();
+  if (!_mesActualId || !getMesById(_mesActualId)) {
+    _mesActualId = meses[0]?.id || null;
+  }
+  sel.innerHTML = meses.map(m => {
+    const r = (m.desde && m.hasta) ? ` (${m.desde} → ${m.hasta})` : ' (sin rango)';
+    return `<option value="${m.id}" ${m.id === _mesActualId ? 'selected' : ''}>${escapeHtml(m.nombre)}${r}</option>`;
+  }).join('');
+  cargarMes();
+}
+
+function cargarMes() {
+  _mesActualId = document.getElementById('mes-selector').value || _mesActualId;
+  const mes = getMesById(_mesActualId);
+  const info = document.getElementById('mes-rango-info');
+  const wrap = document.getElementById('mes-tabla-wrap');
+  const ver  = document.getElementById('mes-veredicto');
+  if (!mes) {
+    info.innerHTML = ''; wrap.innerHTML = '<div class="info-box">Sin meses configurados.</div>'; ver.innerHTML = '';
+    return;
+  }
+  if (!mes.desde || !mes.hasta) {
+    info.innerHTML = '⚠️ Este mes no tiene rango de fechas. Editalo para que el cálculo funcione.';
+    wrap.innerHTML = '';
+    ver.innerHTML = '';
+    return;
+  }
+  info.innerHTML = `Rango: <strong>${mes.desde}</strong> → <strong>${mes.hasta}</strong>`;
+
+  const metas = getMetasMes(mes.id);
+  const sums  = sumarKPIsSemanas(semanasEnMes(mes));
+  const repos = reposPublicadosEnRango(mes.desde, mes.hasta);
+
+  const filas = [
+    ['Certificaciones publicadas',  sums.certs,         metas.certs ?? 0],
+    ['Postulaciones formales',      sums.postulaciones, metas.postulaciones ?? 0],
+    ['Entrevistas reales',          sums.entrevistas,   metas.entrevistas ?? 0],
+    ['Ingreso freelance USD',       sums.freelance,     metas.freelance ?? 0],
+    ['Repos GitHub publicados',     repos,              metas.repos ?? 0],
+    ['Conexiones LinkedIn',         sums.conexiones,    metas.conexiones ?? 0],
+    ['Posts técnicos en inglés',    sums.posts,         metas.posts ?? 0],
+    ['Proyectos freelance',         sums.proyectos,     metas.proyectos ?? 0]
+  ];
+
+  let metasNoCero = 0, metasOk = 0, sumPct = 0;
+  filas.forEach(([_, real, meta]) => {
+    if (meta > 0) {
+      metasNoCero++;
+      const pct = real / meta;
+      sumPct += Math.min(pct, 1);
+      if (pct >= 0.7) metasOk++;
+    }
+  });
+
+  let html = '<table><thead><tr><th>Métrica</th><th>Meta</th><th>Real</th><th>% cumplimiento</th></tr></thead><tbody>';
+  filas.forEach(([nombre, real, meta]) => {
+    let pct = meta > 0 ? Math.round(real / meta * 100) : null;
+    let cls = 'pct-red';
+    if (pct === null) cls = '';
+    else if (pct >= 70) cls = 'pct-green';
+    else if (pct >= 40) cls = 'pct-orange';
+    const pctTxt = pct === null ? 'sin meta' : pct + '%';
+    const barW = pct === null ? 0 : Math.min(100, pct);
+    html += `<tr>
+      <td>${escapeHtml(nombre)}</td>
+      <td>${meta || '—'}</td>
+      <td><strong>${real}</strong></td>
+      <td><div class="progress-bar ${cls}"><div style="width:${barW}%"></div><span class="lbl">${pctTxt}</span></div></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  if (metasNoCero === 0) {
+    ver.innerHTML = '<div class="veredicto parcial">⚠️ Este mes no tiene metas configuradas. Editalas con "🎯 Editar metas".</div>';
+  } else {
+    const promedio = Math.round((sumPct / metasNoCero) * 100);
+    if (promedio >= 70) {
+      ver.innerHTML = `<div class="veredicto aprobado">✅ MES APROBADO — promedio ${promedio}% · ${metasOk}/${metasNoCero} metas cumplidas (≥70%)</div>`;
+    } else if (promedio >= 40) {
+      ver.innerHTML = `<div class="veredicto parcial">⚠️ MES PARCIAL — promedio ${promedio}% · ${metasOk}/${metasNoCero} metas cumplidas — revisar prioridades con el coach</div>`;
+    } else {
+      ver.innerHTML = `<div class="veredicto fallido">❌ MES FALLIDO — promedio ${promedio}% · solo ${metasOk}/${metasNoCero} metas alcanzadas — escalar con el coach</div>`;
+    }
+  }
+}
+
+function abrirModalMes(id) {
+  const m = id ? getMesById(id) : null;
+  document.getElementById('mes-modal-title').textContent = m ? 'Editar mes' : 'Nuevo mes';
+  document.getElementById('mes-modal-id').value = id || '';
+  document.getElementById('mes-modal-nombre').value = m?.nombre || '';
+  document.getElementById('mes-modal-desde').value  = m?.desde  || '';
+  document.getElementById('mes-modal-hasta').value  = m?.hasta  || '';
+  document.getElementById('mes-modal-borrar').style.display = m ? '' : 'none';
+  document.getElementById('mes-modal').classList.add('show');
+}
+
+function cerrarModalMes() { document.getElementById('mes-modal').classList.remove('show'); }
+
+function guardarMesModal() {
+  const id = document.getElementById('mes-modal-id').value;
+  const nombre = document.getElementById('mes-modal-nombre').value.trim();
+  if (!nombre) { toast('Nombre obligatorio', false); return; }
+  const desde = document.getElementById('mes-modal-desde').value;
+  const hasta = document.getElementById('mes-modal-hasta').value;
+  if (desde && hasta && desde > hasta) { toast('Rango inválido (desde > hasta)', false); return; }
+
+  if (!Array.isArray(state.meses)) state.meses = [];
+  if (id) {
+    const m = getMesById(id);
+    if (m) { m.nombre = nombre; m.desde = desde; m.hasta = hasta; }
+  } else {
+    const newId = 'm' + Date.now().toString(36);
+    const orden = Math.max(0, ...state.meses.map(m => m.orden ?? 0)) + 1;
+    state.meses.push({ id: newId, nombre, desde, hasta, orden });
+    if (!state.metas_mensuales) state.metas_mensuales = {};
+    state.metas_mensuales[newId] = { certs: 0, postulaciones: 0, entrevistas: 0, freelance: 0, repos: 0, conexiones: 0, posts: 0, proyectos: 0 };
+    _mesActualId = newId;
+  }
+  cerrarModalMes();
+  renderMesUI();
+  guardar();
+  toast(id ? 'Mes actualizado' : 'Mes agregado');
+}
+
+function borrarMesDesdeModal() {
+  const id = document.getElementById('mes-modal-id').value;
+  const m = getMesById(id);
+  if (!m) return;
+  if (!confirm('¿Borrar el mes "' + m.nombre + '"? (Las metas asociadas también)')) return;
+  state.meses = state.meses.filter(x => x.id !== id);
+  if (state.metas_mensuales) delete state.metas_mensuales[id];
+  if (_mesActualId === id) _mesActualId = state.meses[0]?.id || null;
+  cerrarModalMes();
+  renderMesUI();
+  guardar();
+  toast('Mes borrado');
+}
+
+function abrirModalMetas() {
+  if (!_mesActualId) { toast('Seleccioná un mes primero', false); return; }
+  const m = getMesById(_mesActualId);
+  document.getElementById('metas-modal-title').textContent = 'Metas de ' + (m?.nombre || '');
+  const metas = getMetasMes(_mesActualId);
+  document.getElementById('meta-certs').value         = metas.certs         ?? 0;
+  document.getElementById('meta-postulaciones').value = metas.postulaciones ?? 0;
+  document.getElementById('meta-entrevistas').value   = metas.entrevistas   ?? 0;
+  document.getElementById('meta-freelance').value     = metas.freelance     ?? 0;
+  document.getElementById('meta-repos').value         = metas.repos         ?? 0;
+  document.getElementById('meta-conexiones').value    = metas.conexiones    ?? 0;
+  document.getElementById('meta-posts').value         = metas.posts         ?? 0;
+  document.getElementById('meta-proyectos').value     = metas.proyectos     ?? 0;
+  document.getElementById('metas-modal').classList.add('show');
+}
+
+function cerrarModalMetas() { document.getElementById('metas-modal').classList.remove('show'); }
+
+function guardarMetasModal() {
+  if (!_mesActualId) return;
+  if (!state.metas_mensuales) state.metas_mensuales = {};
+  state.metas_mensuales[_mesActualId] = {
+    certs:         +document.getElementById('meta-certs').value || 0,
+    postulaciones: +document.getElementById('meta-postulaciones').value || 0,
+    entrevistas:   +document.getElementById('meta-entrevistas').value || 0,
+    freelance:     +document.getElementById('meta-freelance').value || 0,
+    repos:         +document.getElementById('meta-repos').value || 0,
+    conexiones:    +document.getElementById('meta-conexiones').value || 0,
+    posts:         +document.getElementById('meta-posts').value || 0,
+    proyectos:     +document.getElementById('meta-proyectos').value || 0
+  };
+  cerrarModalMetas();
+  cargarMes();
+  guardar();
+  toast('Metas actualizadas');
+}
+
+// =====================================================
+// ============= FEATURE 2 — TECH STACK LADDER ==========
+// =====================================================
+function getLayers() {
+  if (!Array.isArray(state.tech_stack_layers)) state.tech_stack_layers = buildDefaultLayers();
+  return state.tech_stack_layers.slice().sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+}
+
+function getLayerById(id) {
+  return (state.tech_stack_layers || []).find(l => l.id === id) || null;
+}
+
+function nuevoIdLayer(codigo) {
+  let base = (codigo || 'layer').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'layer';
+  let id = base, n = 1;
+  const existing = new Set((state.tech_stack_layers || []).map(l => l.id));
+  while (existing.has(id)) { id = base + '-' + (++n); }
+  return id;
+}
+
+function renderLadder() {
+  const c = document.getElementById('ladder-container');
+  if (!c) return;
+  const layers = getLayers();
+  if (layers.length === 0) {
+    c.innerHTML = '<div class="small">Sin capas. Agregá una con "＋ Nueva Capa".</div>';
+    return;
+  }
+  c.innerHTML = layers.map((l, idx) => {
+    const evidencia = (l.evidencia_url || '').trim();
+    const evidenciaHtml = evidencia
+      ? `<div class="layer-evidencia">🔗 <a href="${escapeAttr(evidencia)}" target="_blank">${escapeHtml(evidencia)}</a></div>`
+      : (l.estado === 'completado' ? `<div class="layer-evidencia" style="color:#C5504B">⚠️ falta URL pública de evidencia</div>` : '');
+    return `
+      <div class="layer-row layer-${l.estado}" data-layer="${l.id}">
+        <div class="layer-codigo">${escapeHtml(l.codigo)}</div>
+        <div class="layer-info">
+          <div class="layer-nombre">${escapeHtml(l.nombre)}</div>
+          ${evidenciaHtml}
+          ${l.fecha_completado ? `<div class="small">Completado: ${l.fecha_completado}</div>` : ''}
+        </div>
+        <select onchange="cambiarEstadoLayer('${l.id}', this.value)">
+          <option value="no_iniciado" ${l.estado==='no_iniciado'?'selected':''}>○ No iniciado</option>
+          <option value="en_progreso" ${l.estado==='en_progreso'?'selected':''}>● En progreso</option>
+          <option value="completado"  ${l.estado==='completado' ?'selected':''}>✓ Completado</option>
+        </select>
+        <div class="layer-actions">
+          <button class="btn-mini" title="Editar" onclick="abrirModalLayer('${l.id}')">✎</button>
+          <button class="btn-mini" title="Subir"  onclick="moverLayer('${l.id}',-1)" ${idx===0?'disabled':''}>↑</button>
+          <button class="btn-mini" title="Bajar"  onclick="moverLayer('${l.id}', 1)" ${idx===layers.length-1?'disabled':''}>↓</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function cambiarEstadoLayer(id, nuevoEstado) {
+  const l = getLayerById(id);
+  if (!l) return;
+  if (nuevoEstado === 'completado') {
+    if (!(l.evidencia_url || '').trim()) {
+      toast('Para marcar Completado necesitás URL pública de evidencia. Editá la capa.', false);
+      // revertir el select
+      renderLadder();
+      return;
+    }
+    // Aviso suave si la capa anterior no está completada
+    const layers = getLayers();
+    const idx = layers.findIndex(x => x.id === id);
+    if (idx > 0 && layers[idx-1].estado !== 'completado') {
+      if (!confirm('⚠️ La capa anterior (' + layers[idx-1].codigo + ') no está completada. ¿Seguro que querés marcar esta como completada?')) {
+        renderLadder();
+        return;
+      }
+    }
+    l.estado = 'completado';
+    l.fecha_completado = fechaHoy();
+  } else {
+    l.estado = nuevoEstado;
+    if (nuevoEstado !== 'completado') l.fecha_completado = null;
+  }
+  renderLadder();
+  guardar();
+}
+
+function moverLayer(id, dir) {
+  const layers = getLayers();
+  const idx = layers.findIndex(l => l.id === id);
+  if (idx < 0) return;
+  const swap = idx + dir;
+  if (swap < 0 || swap >= layers.length) return;
+  const a = layers[idx], b = layers[swap];
+  const tmp = a.orden ?? idx;
+  a.orden = b.orden ?? swap;
+  b.orden = tmp;
+  renderLadder();
+  guardar();
+}
+
+function abrirModalLayer(id) {
+  const l = id ? getLayerById(id) : null;
+  document.getElementById('layer-modal-title').textContent = l ? 'Editar capa' : 'Nueva capa';
+  document.getElementById('layer-modal-id').value = id || '';
+  document.getElementById('layer-modal-codigo').value = l?.codigo || ('L' + (getLayers().length));
+  document.getElementById('layer-modal-nombre').value = l?.nombre || '';
+  document.getElementById('layer-modal-estado').value = l?.estado || 'no_iniciado';
+  document.getElementById('layer-modal-url').value    = l?.evidencia_url || '';
+  document.getElementById('layer-modal-notas').value  = l?.notas || '';
+  document.getElementById('layer-modal-borrar').style.display = l ? '' : 'none';
+  document.getElementById('layer-modal').classList.add('show');
+  setTimeout(() => document.getElementById('layer-modal-nombre').focus(), 50);
+}
+
+function cerrarModalLayer() { document.getElementById('layer-modal').classList.remove('show'); }
+
+function guardarLayerModal() {
+  const id = document.getElementById('layer-modal-id').value;
+  const codigo = document.getElementById('layer-modal-codigo').value.trim();
+  const nombre = document.getElementById('layer-modal-nombre').value.trim();
+  if (!nombre) { toast('Nombre obligatorio', false); return; }
+  const estado = document.getElementById('layer-modal-estado').value;
+  const evidencia_url = document.getElementById('layer-modal-url').value.trim();
+  const notas  = document.getElementById('layer-modal-notas').value.trim();
+  if (estado === 'completado' && !evidencia_url) {
+    toast('Para Completado, la URL de evidencia es obligatoria', false);
+    return;
+  }
+
+  if (!Array.isArray(state.tech_stack_layers)) state.tech_stack_layers = [];
+
+  if (id) {
+    const l = getLayerById(id);
+    if (l) {
+      const fueCompletada = l.estado === 'completado';
+      l.codigo = codigo || l.codigo;
+      l.nombre = nombre;
+      l.estado = estado;
+      l.evidencia_url = evidencia_url;
+      l.notas = notas;
+      if (estado === 'completado' && !fueCompletada) l.fecha_completado = fechaHoy();
+      if (estado !== 'completado') l.fecha_completado = null;
+    }
+  } else {
+    const orden = Math.max(-1, ...state.tech_stack_layers.map(l => l.orden ?? 0)) + 1;
+    state.tech_stack_layers.push({
+      id: nuevoIdLayer(codigo || nombre),
+      orden, codigo: codigo || ('L' + orden),
+      nombre, estado, evidencia_url, notas,
+      fecha_completado: estado === 'completado' ? fechaHoy() : null
+    });
+  }
+  cerrarModalLayer();
+  renderLadder();
+  guardar();
+  toast(id ? 'Capa actualizada' : 'Capa agregada');
+}
+
+function borrarLayerDesdeModal() {
+  const id = document.getElementById('layer-modal-id').value;
+  if (!id) return;
+  const l = getLayerById(id);
+  if (!l) return;
+  if (!confirm('¿Borrar la capa "' + l.codigo + ' ' + l.nombre + '"?')) return;
+  state.tech_stack_layers = state.tech_stack_layers.filter(x => x.id !== id);
+  cerrarModalLayer();
+  renderLadder();
+  guardar();
+  toast('Capa eliminada');
+}
+
+// =====================================================
+// ============= FEATURE 4 — RUTAS DINÁMICAS ============
+// =====================================================
+const RUTA_EMOJIS = ['🍁','🦘','🇩🇪','🇺🇸','🇬🇧','🇪🇸','🌎','💻','🔬','🏭','📊','🚀'];
+let _modalRutaId = null;
+let _modalRutaEmoji = '🌎';
+
+function getRutas() {
+  if (!Array.isArray(state.rutas_carrera)) state.rutas_carrera = buildDefaultRutas();
+  return state.rutas_carrera;
+}
+function getRutaById(id) { return (state.rutas_carrera || []).find(r => r.id === id) || null; }
+
+function rutaProgreso(r) {
+  const total = (r.milestones || []).length;
+  const done = (r.milestones || []).filter(m => m.completado).length;
+  return { done, total, pct: total ? Math.round(done/total*100) : 0 };
+}
+
+function renderRutas() {
+  const c = document.getElementById('rutas-container');
+  const sumWrap = document.getElementById('rutas-summary');
+  if (!c) return;
+  const rutas = getRutas();
+
+  // Resumen
+  const activas = rutas.filter(r => r.estado === 'activa');
+  const pausadas = rutas.filter(r => r.estado === 'pausada');
+  const descartadas = rutas.filter(r => r.estado === 'descartada');
+  // Milestone más cercano de las activas
+  let proxMilestone = null;
+  activas.forEach(r => {
+    const p = rutaProgreso(r);
+    if (p.total > 0 && p.pct > 0 && p.pct < 100) {
+      if (!proxMilestone || p.pct > proxMilestone.pct) {
+        proxMilestone = { ruta: r.nombre, pct: p.pct };
+      }
+    }
+  });
+
+  sumWrap.innerHTML = `
+    <div class="kpi-card"><div class="label">Activas</div><div class="value">${activas.length}</div></div>
+    <div class="kpi-card"><div class="label">Pausadas</div><div class="value">${pausadas.length}</div></div>
+    <div class="kpi-card"><div class="label">Descartadas</div><div class="value">${descartadas.length}</div></div>
+    <div class="kpi-card"><div class="label">Próxima en completar</div><div class="value" style="font-size:13px;line-height:1.4;">${proxMilestone ? escapeHtml(proxMilestone.ruta) + ' (' + proxMilestone.pct + '%)' : '—'}</div></div>
+  `;
+
+  // Ordenar: activas → pausadas → descartadas
+  const orderRank = { activa: 0, pausada: 1, descartada: 2 };
+  const ordenadas = rutas.slice().sort((a,b) => (orderRank[a.estado] ?? 9) - (orderRank[b.estado] ?? 9));
+
+  if (ordenadas.length === 0) {
+    c.innerHTML = '<div class="info-box">Sin rutas. Creá una con "＋ Nueva Ruta".</div>';
+    return;
+  }
+
+  c.innerHTML = ordenadas.map(r => renderRutaCard(r)).join('');
+}
+
+function renderRutaCard(r) {
+  const p = rutaProgreso(r);
+  const estadoLabel = { activa: '🟢 Activa', pausada: '⏸ Pausada', descartada: '✕ Descartada' }[r.estado] || r.estado;
+  const milestonesHtml = (r.milestones || []).map(m => `
+    <div class="milestone-row ${m.completado ? 'mdone' : ''}" data-mid="${m.id}">
+      <input type="checkbox" ${m.completado ? 'checked' : ''} onchange="toggleMilestone('${r.id}','${m.id}', this.checked)">
+      <div>
+        <div class="mtxt">${escapeHtml(m.texto)}</div>
+        ${m.notas ? `<div class="small" style="margin-top:2px">${escapeHtml(m.notas)}</div>` : ''}
+      </div>
+      <span class="mfecha">${m.fecha_completado || ''}</span>
+      <button class="btn-mini" title="Editar" onclick="abrirModalMilestone('${r.id}','${m.id}')">✎</button>
+    </div>
+  `).join('') || '<div class="small">Sin milestones todavía.</div>';
+
+  return `
+    <div class="ruta-card estado-${r.estado}" data-ruta-id="${r.id}">
+      <div class="ruta-header">
+        <span class="ruta-emoji">${r.emoji || '🌎'}</span>
+        <div class="ruta-titulo">${escapeHtml(r.nombre)}<span class="estado-pill">${estadoLabel}</span></div>
+        <div class="ruta-actions">
+          <button class="btn-mini" onclick="abrirModalMilestone('${r.id}', null)">＋ Milestone</button>
+          <button class="btn-mini" onclick="abrirModalRuta('${r.id}')">✎ Editar</button>
+          ${r.estado !== 'descartada'
+            ? `<button class="btn-mini danger" onclick="descartarRuta('${r.id}')">🗑 Descartar</button>`
+            : `<button class="btn-mini" onclick="reactivarRuta('${r.id}')">↻ Reactivar</button>`}
+        </div>
+      </div>
+      <div class="ruta-progreso">
+        Progreso: <strong>${p.done}/${p.total}</strong> (${p.pct}%)
+        <div class="progress-bar pct-${p.pct >= 70 ? 'green' : p.pct >= 40 ? 'orange' : 'red'}" style="margin-top:4px;">
+          <div style="width:${p.pct}%"></div>
+          <span class="lbl">${p.pct}%</span>
+        </div>
+      </div>
+      <div class="ruta-milestones">${milestonesHtml}</div>
+      ${r.descripcion ? `<div class="small" style="margin-top:8px">${escapeHtml(r.descripcion)}</div>` : ''}
+      <div class="ruta-analisis">
+        <details>
+          <summary>🧠 Por qué esta ruta te conviene — análisis Career Architect</summary>
+          <textarea data-ruta-analisis="${r.id}" placeholder="Razonamiento estratégico: por qué tu perfil encaja, plazos, riesgos, qué la valida o invalida…" onchange="guardarAnalisisRuta('${r.id}', this.value)">${escapeHtml(r.analisis || '')}</textarea>
+        </details>
+      </div>
+    </div>
+  `;
+}
+
+function guardarAnalisisRuta(rutaId, valor) {
+  const r = getRutaById(rutaId);
+  if (!r) return;
+  r.analisis = valor;
+  guardar();
+}
+
+function toggleMilestone(rutaId, mid, checked) {
+  const r = getRutaById(rutaId);
+  if (!r) return;
+  const m = (r.milestones || []).find(x => x.id === mid);
+  if (!m) return;
+  m.completado = checked;
+  m.fecha_completado = checked ? fechaHoy() : null;
+  renderRutas();
+  guardar();
+}
+
+function abrirModalRuta(id) {
+  _modalRutaId = id;
+  const r = id ? getRutaById(id) : null;
+  document.getElementById('ruta-modal-title').textContent = r ? 'Editar ruta' : 'Nueva Ruta';
+  document.getElementById('ruta-modal-id').value = id || '';
+  document.getElementById('ruta-modal-nombre').value = r?.nombre || '';
+  document.getElementById('ruta-modal-descripcion').value = r?.descripcion || '';
+  document.getElementById('ruta-modal-analisis').value = r?.analisis || '';
+  document.getElementById('ruta-modal-estado').value = r?.estado || 'activa';
+  _modalRutaEmoji = r?.emoji || '🌎';
+  renderEmojisRuta();
+  document.getElementById('ruta-modal-borrar').style.display = r ? '' : 'none';
+  document.getElementById('ruta-modal').classList.add('show');
+  setTimeout(() => document.getElementById('ruta-modal-nombre').focus(), 50);
+}
+
+function renderEmojisRuta() {
+  const wrap = document.getElementById('ruta-modal-emojis');
+  wrap.innerHTML = RUTA_EMOJIS.map(e => `
+    <span class="color-swatch ${e === _modalRutaEmoji ? 'selected' : ''}"
+          style="background:#F0F0F0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;"
+          onclick="seleccionarEmojiRuta('${e}')">${e}</span>
+  `).join('');
+}
+
+function seleccionarEmojiRuta(e) { _modalRutaEmoji = e; renderEmojisRuta(); }
+function cerrarModalRuta() { document.getElementById('ruta-modal').classList.remove('show'); _modalRutaId = null; }
+
+function guardarRutaModal() {
+  const id = document.getElementById('ruta-modal-id').value;
+  const nombre = document.getElementById('ruta-modal-nombre').value.trim();
+  if (!nombre) { toast('Nombre obligatorio', false); return; }
+  const desc = document.getElementById('ruta-modal-descripcion').value.trim();
+  const analisis = document.getElementById('ruta-modal-analisis').value.trim();
+  const estado = document.getElementById('ruta-modal-estado').value;
+
+  if (!Array.isArray(state.rutas_carrera)) state.rutas_carrera = [];
+  if (id) {
+    const r = getRutaById(id);
+    if (r) {
+      r.nombre = nombre; r.emoji = _modalRutaEmoji;
+      r.descripcion = desc; r.analisis = analisis; r.estado = estado;
+    }
+  } else {
+    state.rutas_carrera.push({
+      id: 'ruta-' + Date.now().toString(36),
+      nombre, emoji: _modalRutaEmoji, estado,
+      fecha_inicio: fechaHoy(),
+      descripcion: desc, analisis,
+      milestones: []
+    });
+  }
+  cerrarModalRuta();
+  renderRutas();
+  guardar();
+  toast(id ? 'Ruta actualizada' : 'Ruta creada');
+}
+
+function borrarRutaDesdeModal() {
+  const id = document.getElementById('ruta-modal-id').value;
+  if (!id) return;
+  const r = getRutaById(id);
+  if (!r) return;
+  if (!confirm('¿Eliminar definitivamente "' + r.nombre + '"?\n\nMejor "Descartar" para preservar el historial.')) return;
+  state.rutas_carrera = state.rutas_carrera.filter(x => x.id !== id);
+  cerrarModalRuta();
+  renderRutas();
+  guardar();
+  toast('Ruta eliminada');
+}
+
+function descartarRuta(id) {
+  const r = getRutaById(id);
+  if (!r) return;
+  if (!confirm('¿Descartar "' + r.nombre + '"? (queda visible en historial)')) return;
+  r.estado = 'descartada';
+  renderRutas();
+  guardar();
+  toast('Ruta descartada');
+}
+
+function reactivarRuta(id) {
+  const r = getRutaById(id);
+  if (!r) return;
+  r.estado = 'activa';
+  renderRutas();
+  guardar();
+  toast('Ruta reactivada');
+}
+
+// Milestones
+function abrirModalMilestone(rutaId, mid) {
+  document.getElementById('milestone-modal-ruta-id').value = rutaId;
+  document.getElementById('milestone-modal-id').value = mid || '';
+  let m = null;
+  if (mid) {
+    const r = getRutaById(rutaId);
+    m = (r?.milestones || []).find(x => x.id === mid);
+  }
+  document.getElementById('milestone-modal-title').textContent = m ? 'Editar milestone' : 'Nuevo milestone';
+  document.getElementById('milestone-modal-texto').value = m?.texto || '';
+  document.getElementById('milestone-modal-notas').value = m?.notas || '';
+  document.getElementById('milestone-modal-borrar').style.display = m ? '' : 'none';
+  document.getElementById('milestone-modal').classList.add('show');
+  setTimeout(() => document.getElementById('milestone-modal-texto').focus(), 50);
+}
+function cerrarModalMilestone() { document.getElementById('milestone-modal').classList.remove('show'); }
+
+function guardarMilestoneModal() {
+  const rutaId = document.getElementById('milestone-modal-ruta-id').value;
+  const mid    = document.getElementById('milestone-modal-id').value;
+  const texto  = document.getElementById('milestone-modal-texto').value.trim();
+  const notas  = document.getElementById('milestone-modal-notas').value.trim();
+  if (!texto) { toast('Texto obligatorio', false); return; }
+  const r = getRutaById(rutaId);
+  if (!r) return;
+  if (!Array.isArray(r.milestones)) r.milestones = [];
+  if (mid) {
+    const m = r.milestones.find(x => x.id === mid);
+    if (m) { m.texto = texto; m.notas = notas; }
+  } else {
+    r.milestones.push({
+      id: 'm' + Date.now().toString(36),
+      texto, completado: false, fecha_completado: null, notas
+    });
+  }
+  cerrarModalMilestone();
+  renderRutas();
+  guardar();
+  toast(mid ? 'Milestone actualizado' : 'Milestone agregado');
+}
+
+function borrarMilestoneDesdeModal() {
+  const rutaId = document.getElementById('milestone-modal-ruta-id').value;
+  const mid    = document.getElementById('milestone-modal-id').value;
+  const r = getRutaById(rutaId);
+  if (!r || !mid) return;
+  if (!confirm('¿Eliminar este milestone?')) return;
+  r.milestones = (r.milestones || []).filter(x => x.id !== mid);
+  cerrarModalMilestone();
+  renderRutas();
+  guardar();
+  toast('Milestone eliminado');
+}
+
+// =====================================================
+// ============= FEATURE 5 — FREELANCE TIER =============
+// =====================================================
+function getResenasAcumuladas() {
+  let total = 0;
+  for (const k in (state.semanas || {})) {
+    total += +state.semanas[k].resenas || 0;
+  }
+  return total;
+}
+
+function getTierActual() {
+  const ft = state.freelance_tier || buildDefaultFreelanceTier();
+  const total = getResenasAcumuladas();
+  let cur = ft.tiers[0];
+  ft.tiers.forEach(t => {
+    if (total >= t.desde && (t.hasta === null || t.hasta === undefined || total <= t.hasta)) cur = t;
+  });
+  return { tier: cur, total };
+}
+
+function renderTierBadge() {
+  const c = document.getElementById('tier-badge-container');
+  if (!c) return;
+  const ft = state.freelance_tier || buildDefaultFreelanceTier();
+  const { tier, total } = getTierActual();
+  // Próximo tier
+  const idx = ft.tiers.findIndex(t => t.nombre === tier.nombre);
+  const next = ft.tiers[idx + 1];
+  const faltan = next ? Math.max(0, next.desde - total) : 0;
+
+  // Felicitación si subió de tier
+  if (ft.ultimo_tier_visto !== tier.nombre) {
+    if (idx > 0 && ft.tiers.findIndex(t => t.nombre === ft.ultimo_tier_visto) < idx) {
+      toast('🎉 Subiste a ' + tier.nombre + '! (' + total + ' reseñas acumuladas)');
+    }
+    ft.ultimo_tier_visto = tier.nombre;
+    guardar();
+  }
+
+  c.innerHTML = `
+    <div class="tier-badge-card">
+      <span class="tier-badge ${tier.clase || 'tier-1'}">${escapeHtml(tier.nombre)}</span>
+      <div class="tier-info">
+        <strong>${total}</strong> reseñas acumuladas
+        ${next ? `<div class="small">Para ${next.nombre}: faltan <strong>${faltan}</strong> reseña${faltan===1?'':'s'}</div>` : `<div class="small">🏆 Tier máximo alcanzado</div>`}
+        <div class="small">Plataformas: ${(ft.plataformas || []).map(escapeHtml).join(' · ')}</div>
+      </div>
+    </div>
+  `;
+}
+
+// =====================================================
+// ============= FEATURE 6 — FILTRO 6 VERDADES ==========
+// =====================================================
+function getDecisionFilter() {
+  if (!state.decision_filter) state.decision_filter = buildDefaultDecisionFilter();
+  return state.decision_filter;
+}
+
+function renderFiltroVerdades() {
+  const c = document.getElementById('filtro-verdades-list');
+  if (!c) return;
+  const df = getDecisionFilter();
+  c.innerHTML = df.verdades.map((v, i) => `
+    <div class="verdad-row">
+      <input type="checkbox" id="verdad-${i}">
+      <label for="verdad-${i}"><strong>${i+1}.</strong> ${escapeHtml(v)}</label>
+    </div>
+  `).join('');
+}
+
+function evaluarDecision() {
+  const df = getDecisionFilter();
+  const texto = document.getElementById('filtro-decision-texto').value.trim();
+  if (!texto) { toast('Escribí qué decisión estás evaluando', false); return; }
+  const aprobadas = [];
+  df.verdades.forEach((_, i) => {
+    if (document.getElementById('verdad-' + i)?.checked) aprobadas.push(i);
+  });
+  const total = df.verdades.length;
+  const n = aprobadas.length;
+  const umbral = df.umbral ?? Math.ceil(total / 1.5);
+  let resultado, cls, emoji;
+  if (n >= umbral) {
+    resultado = 'EJECUTAR AHORA'; cls = 'ejecutar'; emoji = '✅';
+  } else if (n >= umbral - 1) {
+    resultado = 'PROCEDER CON CAUTELA'; cls = 'cautela'; emoji = '⚠️';
+  } else {
+    resultado = 'NO LO HAGAS'; cls = 'no'; emoji = '❌';
+  }
+  document.getElementById('filtro-resultado-wrap').innerHTML = `
+    <div class="filtro-result ${cls}">${emoji} ${resultado} — pasó ${n}/${total} verdades (umbral: ${umbral})</div>
+  `;
+
+  // Guardar en historial
+  if (!Array.isArray(df.historial)) df.historial = [];
+  df.historial.unshift({
+    fecha: fechaHoy(),
+    texto,
+    n_aprobadas: n,
+    total,
+    umbral,
+    resultado,
+    aprobadas: aprobadas.map(i => i + 1)
+  });
+  if (df.historial.length > 20) df.historial = df.historial.slice(0, 20);
+  guardar();
+  renderHistorialDecisiones();
+}
+
+function resetFiltro() {
+  document.getElementById('filtro-decision-texto').value = '';
+  const df = getDecisionFilter();
+  df.verdades.forEach((_, i) => {
+    const cb = document.getElementById('verdad-' + i);
+    if (cb) cb.checked = false;
+  });
+  document.getElementById('filtro-resultado-wrap').innerHTML = '';
+}
+
+function renderHistorialDecisiones() {
+  const c = document.getElementById('filtro-historial');
+  if (!c) return;
+  const df = getDecisionFilter();
+  if (!df.historial || df.historial.length === 0) {
+    c.innerHTML = '<div class="small">Sin decisiones evaluadas todavía.</div>';
+    return;
+  }
+  c.innerHTML = df.historial.map(h => {
+    const cls = h.resultado.includes('NO') ? 'no' : (h.resultado.includes('CAUTELA') ? 'cautela' : 'ejecutar');
+    return `
+      <div class="historial-decision">
+        <div><strong>${escapeHtml(h.texto)}</strong> <span class="resultado filtro-result ${cls}" style="padding:2px 8px;font-size:11px">${escapeHtml(h.resultado)}</span></div>
+        <div class="meta">${h.fecha} · ${h.n_aprobadas}/${h.total} verdades · pasó: ${(h.aprobadas || []).join(', ') || '—'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function abrirModalConfigFiltro() {
+  const df = getDecisionFilter();
+  const list = document.getElementById('config-verdades-list');
+  list.innerHTML = df.verdades.map((v, i) => `
+    <div class="form-row">
+      <label>Verdad #${i + 1}</label>
+      <input type="text" id="config-verdad-${i}" value="${escapeAttr(v)}" maxlength="200">
+    </div>
+  `).join('');
+  document.getElementById('config-umbral').value = df.umbral ?? 4;
+  document.getElementById('config-umbral').max = df.verdades.length;
+  document.getElementById('filtro-config-modal').classList.add('show');
+}
+
+function cerrarModalConfigFiltro() { document.getElementById('filtro-config-modal').classList.remove('show'); }
+
+function guardarConfigFiltro() {
+  const df = getDecisionFilter();
+  const nuevas = df.verdades.map((_, i) => document.getElementById('config-verdad-' + i).value.trim()).filter(v => v);
+  if (nuevas.length === 0) { toast('Debe haber al menos una verdad', false); return; }
+  df.verdades = nuevas;
+  df.umbral = Math.max(1, Math.min(nuevas.length, +document.getElementById('config-umbral').value || 4));
+  cerrarModalConfigFiltro();
+  renderFiltroVerdades();
+  guardar();
+  toast('Filtro actualizado');
+}
+
+function abrirFiltroDesdeFab() {
+  // Cambiar a tab Datos y hacer scroll al filtro
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('section.tab-content').forEach(s => s.classList.remove('active'));
+  document.querySelector('nav.tabs button[data-tab="datos"]').classList.add('active');
+  document.getElementById('tab-datos').classList.add('active');
+  renderFiltroVerdades();
+  renderHistorialDecisiones();
+  setTimeout(() => {
+    document.getElementById('filtro-decision-texto').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('filtro-decision-texto').focus();
+  }, 100);
+}
+
 // ============= GENERACIÓN PDF =============
 function generarPDF() {
   const { jsPDF } = window.jspdf;
@@ -2394,7 +3956,72 @@ function generarPDF() {
     const ex = it.examen_nombre ? ` (${it.examen_nombre}${it.examen_score ? ' ' + it.examen_score : ''})` : '';
     doc.text(`• ${it.nombre}: ${it.nivel || '—'}${ex}`, MARGIN + 10, y); y += 12;
   });
+  // FEATURE 5 — Tier en el PDF
+  const ti = getTierActual();
+  doc.text(`• Freelance: ${ti.tier.nombre} · ${ti.total} reseñas acumuladas`, MARGIN + 10, y); y += 12;
+  // FEATURE 2 — Tech stack avance
+  const layersDone = (state.tech_stack_layers || []).filter(l => l.estado === 'completado').length;
+  const layersTotal = (state.tech_stack_layers || []).length;
+  doc.text(`• Tech Stack Ladder: ${layersDone}/${layersTotal} capas completadas`, MARGIN + 10, y); y += 12;
   y += 6;
+
+  // FEATURE 3 — Artefactos faltantes esta semana
+  if (y > 600) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('5b. PRODUCCIÓN PÚBLICA (artefactos)', MARGIN, y); y += 14;
+  let bloquesDone = 0, bloquesConArt = 0, bloquesSinArt = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lunes + 'T12:00:00'); d.setDate(d.getDate() + i);
+    const fecha = d.toISOString().slice(0, 10);
+    const data = state.dias[fecha];
+    if (!data) continue;
+    Object.entries(data.bloques || {}).forEach(([catId, b]) => {
+      if (!b.done) return;
+      if (!categoriaExigeArtefacto(catId)) return;
+      bloquesDone++;
+      if (b.sin_artefacto) bloquesSinArt++; else bloquesConArt++;
+    });
+  }
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(`Bloques con artefacto público: ${bloquesConArt}/${bloquesDone}`, MARGIN + 10, y); y += 12;
+  if (bloquesSinArt > 0) {
+    doc.setTextColor(197, 80, 75); doc.setFont('helvetica', 'bold');
+    doc.text(`ATENCIÓN: ${bloquesSinArt} bloques cerraron SIN artefacto público — revisar con el coach`, MARGIN + 10, y); y += 12;
+    doc.setTextColor(60, 60, 60); doc.setFont('helvetica', 'normal');
+  }
+  y += 6;
+
+  // FEATURE 4 — Estado de rutas
+  if (y > 600) { doc.addPage(); y = MARGIN; }
+  doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
+  doc.text('5c. ESTADO DE RUTAS DE CARRERA', MARGIN, y); y += 14;
+  const rutasActivas = (state.rutas_carrera || []).filter(r => r.estado === 'activa');
+  if (rutasActivas.length === 0) {
+    doc.setFontSize(9); doc.setFont('helvetica', 'italic'); doc.setTextColor(120, 120, 120);
+    doc.text('(sin rutas activas)', MARGIN + 10, y); y += 12;
+  } else {
+    const rutasBody = rutasActivas.map(r => {
+      const p = rutaProgreso(r);
+      const milestonesSemana = (r.milestones || [])
+        .filter(m => m.completado && m.fecha_completado >= lunes && m.fecha_completado <= (() => {
+          const d = new Date(lunes + 'T12:00:00'); d.setDate(d.getDate() + 6);
+          return d.toISOString().slice(0,10);
+        })())
+        .map(m => m.texto).join(' / ') || '—';
+      const proximos = (r.milestones || []).filter(m => !m.completado).slice(0, 2).map(m => m.texto).join(' / ') || '—';
+      // PDF: omitimos el emoji (Helvetica no soporta emoji ni banderas)
+      return [r.nombre, p.done + '/' + p.total + ' (' + p.pct + '%)', milestonesSemana, proximos];
+    });
+    doc.autoTable({
+      startY: y,
+      head: [['Ruta', 'Progreso', 'Cerrados esta semana', 'Próximos']],
+      body: rutasBody,
+      margin: { left: MARGIN, right: MARGIN },
+      styles: { fontSize: 8, cellPadding: 4 },
+      headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' }
+    });
+    y = doc.lastAutoTable.finalY + 16;
+  }
 
   // Sección 6: REVISIÓN DEL COACH (en blanco)
   if (y > 540) { doc.addPage(); y = MARGIN; }
@@ -2492,7 +4119,7 @@ function generarPDFCompleto() {
     head: [['#', 'Título', 'Autor', 'Estado', 'Progreso', 'Insight aplicado']],
     body: state.libros.map(l => {
       const insight = (l.applied_insight || '').trim();
-      const insightCell = (l.estado === 'terminado' && !insight) ? '⚠️ leído sin aplicar' : (insight || '—');
+      const insightCell = (l.estado === 'terminado' && !insight) ? 'leído sin aplicar (revisar)' : (insight || '—');
       let progreso = '—';
       if (l.paginas_total && l.pagina_actual !== undefined) {
         const pct = Math.min(100, Math.round((l.pagina_actual || 0) / l.paginas_total * 100));
@@ -2536,6 +4163,10 @@ async function initApp() {
   renderHitos();
   renderResumen7Dias();
   actualizarStorageInfo();
+  // FEATURES v2.0 — pre-render para que estén listas al cambiar de tab
+  renderFiltroVerdades();
+  renderHistorialDecisiones();
+  renderTierBadge();
 }
 
 initApp();
