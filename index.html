@@ -605,36 +605,11 @@
   </div>
 
   <div class="card">
-    <h2>🌐 Idiomas</h2>
-    <div class="grid-2">
-      <div>
-        <label>Inglés - Nivel actual autoevaluado</label>
-        <select id="ingles-nivel" onchange="guardarHitos()">
-          <option value="A2">A2</option>
-          <option value="B1">B1</option>
-          <option value="B2">B2</option>
-          <option value="B2+">B2+</option>
-          <option value="C1">C1</option>
-          <option value="C2">C2</option>
-        </select>
-        <label style="margin-top:8px;">IELTS Score (si ya tomó examen)</label>
-        <input type="text" id="ielts" placeholder="Ej: 7.5 overall">
-      </div>
-      <div>
-        <label>Francés - Nivel actual</label>
-        <select id="frances-nivel" onchange="guardarHitos()">
-          <option value="A0">A0 (no iniciado)</option>
-          <option value="A1">A1</option>
-          <option value="A2">A2</option>
-          <option value="B1">B1</option>
-          <option value="B2">B2</option>
-          <option value="C1">C1</option>
-        </select>
-        <label style="margin-top:8px;">TEF Canada Score (si ya tomó examen)</label>
-        <input type="text" id="tef" placeholder="Ej: NCLC 7">
-      </div>
+    <div class="biblioteca-header">
+      <h2>🌐 Idiomas</h2>
+      <button class="btn" onclick="agregarIdioma()">＋ Idioma</button>
     </div>
-    <button class="btn success" onclick="guardarHitos()" style="margin-top: 10px;">💾 Guardar idiomas</button>
+    <div id="lista-idiomas"></div>
   </div>
 
   <div class="card">
@@ -732,6 +707,47 @@
 </section>
 
 </main>
+
+<!-- Modal agregar/editar idioma -->
+<div class="modal-overlay" id="idioma-modal" onclick="if(event.target===this)cerrarModalIdioma()">
+  <div class="modal">
+    <h2 id="idioma-modal-title">Nuevo idioma</h2>
+    <input type="hidden" id="idioma-modal-id" value="">
+    <div class="form-row">
+      <label>Idioma *</label>
+      <input type="text" id="idioma-modal-nombre" placeholder="Ej: Francés, Portugués, Japonés…" maxlength="40">
+    </div>
+    <div class="form-row">
+      <label>Nivel actual</label>
+      <select id="idioma-modal-nivel">
+        <option value="A0">A0 (no iniciado)</option>
+        <option value="A1">A1 - Principiante</option>
+        <option value="A2">A2</option>
+        <option value="B1">B1</option>
+        <option value="B2">B2</option>
+        <option value="B2+">B2+</option>
+        <option value="C1">C1</option>
+        <option value="C2">C2</option>
+        <option value="Nativo">Nativo</option>
+      </select>
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Examen (opcional)</label>
+        <input type="text" id="idioma-modal-examen-nombre" placeholder="Ej: IELTS, TEF, DELE, JLPT" maxlength="30">
+      </div>
+      <div class="form-row">
+        <label>Score / nivel del examen</label>
+        <input type="text" id="idioma-modal-examen-score" placeholder="Ej: 7.5 overall · NCLC 7" maxlength="40">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalIdioma()">Cancelar</button>
+      <button class="btn danger" id="idioma-modal-borrar" style="margin-right:auto" onclick="borrarIdiomaDesdeModal()">🗑 Borrar</button>
+      <button class="btn success" onclick="guardarIdiomaModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal agregar/editar libro -->
 <div class="modal-overlay" id="libro-modal" onclick="if(event.target===this)cerrarModalLibro()">
@@ -964,6 +980,25 @@ function buildDefaultLibros() {
   }));
 }
 
+const NIVELES_CEFR = ['A0', 'A1', 'A2', 'B1', 'B2', 'B2+', 'C1', 'C2', 'Nativo'];
+
+function buildDefaultIdiomas() {
+  return [
+    { id: 'ingles',  nombre: 'Inglés',  nivel: 'B2', examen_nombre: 'IELTS', examen_score: '', orden: 0 },
+    { id: 'frances', nombre: 'Francés', nivel: 'A0', examen_nombre: 'TEF',   examen_score: '', orden: 1 }
+  ];
+}
+
+function migrarIdiomas(idiomas) {
+  if (Array.isArray(idiomas)) return idiomas; // ya v2
+  if (!idiomas || typeof idiomas !== 'object') return buildDefaultIdiomas();
+  // v1: { ingles, frances, ielts, tef }
+  return [
+    { id: 'ingles',  nombre: 'Inglés',  nivel: idiomas.ingles  || 'A0', examen_nombre: 'IELTS', examen_score: idiomas.ielts || '', orden: 0 },
+    { id: 'frances', nombre: 'Francés', nivel: idiomas.frances || 'A0', examen_nombre: 'TEF',   examen_score: idiomas.tef   || '', orden: 1 }
+  ];
+}
+
 function migrarLibro(l) {
   if (l && l.estado) return l; // ya está en v2
   let estado = 'pendiente';
@@ -1004,7 +1039,7 @@ function defaultState() {
     certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
     repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
     libros: buildDefaultLibros(),
-    idiomas: { ingles: 'B2', frances: 'A0', ielts: '', tef: '' }
+    idiomas: buildDefaultIdiomas()
   };
 }
 
@@ -1027,7 +1062,7 @@ async function cargarEstado() {
         } else {
           s.libros = s.libros.map(migrarLibro);
         }
-        s.idiomas = s.idiomas || state.idiomas;
+        s.idiomas = migrarIdiomas(s.idiomas);
         // Migración v1 → v2: si no hay plan.categorias, generarlas desde defaults.
         // Los registros diarios viejos (state.dias[...].bloques.ingles, .tech, etc.)
         // siguen funcionando porque los IDs son los mismos.
@@ -1941,20 +1976,142 @@ function renderHitos() {
   // Libros — render delegado a renderBiblioteca (estados, applied_insight, filtros)
   renderBiblioteca();
 
-  // Idiomas
-  document.getElementById('ingles-nivel').value = state.idiomas.ingles;
-  document.getElementById('frances-nivel').value = state.idiomas.frances;
-  document.getElementById('ielts').value = state.idiomas.ielts;
-  document.getElementById('tef').value = state.idiomas.tef;
+  // Idiomas — render delegado
+  renderIdiomas();
 }
 
-function guardarHitos() {
-  state.idiomas.ingles  = document.getElementById('ingles-nivel').value;
-  state.idiomas.frances = document.getElementById('frances-nivel').value;
-  state.idiomas.ielts   = document.getElementById('ielts').value;
-  state.idiomas.tef     = document.getElementById('tef').value;
+// (Compat) guardarHitos sigue existiendo para hitos no-idiomas si alguien lo invoca
+function guardarHitos() { guardar(); toast('Hitos guardados'); }
+
+// ============= IDIOMAS =============
+function getIdiomas() {
+  if (!Array.isArray(state.idiomas)) state.idiomas = buildDefaultIdiomas();
+  return state.idiomas.slice().sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+}
+
+function getIdiomaById(id) {
+  return (state.idiomas || []).find(i => i.id === id) || null;
+}
+
+function renderIdiomas() {
+  const wrap = document.getElementById('lista-idiomas');
+  if (!wrap) return;
+  const lista = getIdiomas();
+  if (lista.length === 0) {
+    wrap.innerHTML = '<div class="small">Sin idiomas. Agregá uno con ＋ Idioma.</div>';
+    return;
+  }
+  wrap.innerHTML = lista.map(i => {
+    const examen = (i.examen_nombre || i.examen_score)
+      ? ` · ${escapeHtml(i.examen_nombre || '')}${i.examen_score ? ' ' + escapeHtml(i.examen_score) : ''}`
+      : '';
+    return `
+      <div class="libro-row" data-idioma-id="${i.id}">
+        <div class="libro-info">
+          <div class="libro-titulo">🌐 ${escapeHtml(i.nombre)}</div>
+          <div class="libro-meta">Nivel ${escapeHtml(i.nivel || '—')}${examen}</div>
+        </div>
+        <span class="libro-estado-badge estado-pendiente">${escapeHtml(i.nivel || '—')}</span>
+        <div class="libro-actions">
+          <button class="btn-mini" title="Editar" onclick="editarIdioma('${i.id}')">✎</button>
+          <button class="btn-mini" title="Subir"  onclick="moverIdioma('${i.id}', -1)">↑</button>
+          <button class="btn-mini" title="Bajar"  onclick="moverIdioma('${i.id}', 1)">↓</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+let _modalIdiomaId = null;
+
+function agregarIdioma() { abrirModalIdioma(null); }
+function editarIdioma(id) { abrirModalIdioma(id); }
+
+function abrirModalIdioma(id) {
+  _modalIdiomaId = id;
+  const it = id ? getIdiomaById(id) : null;
+  document.getElementById('idioma-modal-title').textContent = it ? 'Editar idioma' : 'Nuevo idioma';
+  document.getElementById('idioma-modal-id').value = id || '';
+  document.getElementById('idioma-modal-nombre').value = it?.nombre || '';
+  document.getElementById('idioma-modal-nivel').value = NIVELES_CEFR.includes(it?.nivel) ? it.nivel : 'A0';
+  document.getElementById('idioma-modal-examen-nombre').value = it?.examen_nombre || '';
+  document.getElementById('idioma-modal-examen-score').value = it?.examen_score || '';
+  document.getElementById('idioma-modal-borrar').style.display = it ? '' : 'none';
+  document.getElementById('idioma-modal').classList.add('show');
+  setTimeout(() => document.getElementById('idioma-modal-nombre').focus(), 50);
+}
+
+function cerrarModalIdioma() {
+  document.getElementById('idioma-modal').classList.remove('show');
+  _modalIdiomaId = null;
+}
+
+function nuevoIdIdioma(nombre) {
+  let base = (nombre || 'idioma').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'idioma';
+  let id = base, n = 1;
+  const existing = new Set((state.idiomas || []).map(i => i.id));
+  while (existing.has(id)) { id = base + '-' + (++n); }
+  return id;
+}
+
+function guardarIdiomaModal() {
+  const nombre = document.getElementById('idioma-modal-nombre').value.trim();
+  if (!nombre) { toast('El nombre del idioma es obligatorio', false); return; }
+  const nivel = document.getElementById('idioma-modal-nivel').value;
+  const examen_nombre = document.getElementById('idioma-modal-examen-nombre').value.trim();
+  const examen_score = document.getElementById('idioma-modal-examen-score').value.trim();
+
+  if (!Array.isArray(state.idiomas)) state.idiomas = [];
+
+  if (_modalIdiomaId) {
+    const it = getIdiomaById(_modalIdiomaId);
+    if (it) {
+      it.nombre = nombre;
+      it.nivel = nivel;
+      it.examen_nombre = examen_nombre;
+      it.examen_score = examen_score;
+    }
+  } else {
+    const orden = Math.max(-1, ...(state.idiomas.map(i => i.orden ?? 0))) + 1;
+    state.idiomas.push({
+      id: nuevoIdIdioma(nombre),
+      nombre, nivel,
+      examen_nombre, examen_score,
+      orden
+    });
+  }
+  cerrarModalIdioma();
+  renderIdiomas();
   guardar();
-  toast('Hitos guardados');
+  toast(_modalIdiomaId ? 'Idioma actualizado' : 'Idioma agregado');
+}
+
+function borrarIdiomaDesdeModal() {
+  const id = _modalIdiomaId;
+  if (!id) return;
+  const it = getIdiomaById(id);
+  if (!it) return;
+  if (!confirm('¿Borrar el idioma "' + it.nombre + '"?')) return;
+  state.idiomas = (state.idiomas || []).filter(x => x.id !== id);
+  cerrarModalIdioma();
+  renderIdiomas();
+  guardar();
+  toast('Idioma borrado');
+}
+
+function moverIdioma(id, direction) {
+  const lista = getIdiomas();
+  const idx = lista.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const swap = idx + direction;
+  if (swap < 0 || swap >= lista.length) return;
+  const a = lista[idx], b = lista[swap];
+  const tmp = a.orden ?? idx;
+  a.orden = b.orden ?? swap;
+  b.orden = tmp;
+  renderIdiomas();
+  guardar();
 }
 
 function agregarCert() {
@@ -2114,7 +2271,7 @@ function generarPDF() {
     activasPDF.forEach(b => {
       const block = data?.bloques?.[b.id];
       if (block?.done) {
-        row.push('✓ ' + (block.hours || 0) + 'h');
+        row.push((block.hours || 0) + 'h');
       } else { row.push('—'); }
     });
     // Total del día incluye también categorías archivadas con registro
@@ -2152,15 +2309,15 @@ function generarPDF() {
 
   const sd = state.semanas[lunes] || {};
   const kpiBody = [
-    ['Postulaciones formales',    sd.postulaciones || 0,  '5/sem',  (sd.postulaciones || 0) >= 5 ? '✓' : '✗'],
-    ['Entrevistas',                sd.entrevistas || 0,    '1/mes',  (sd.entrevistas || 0) >= 1 ? '✓' : '—'],
-    ['Conexiones LinkedIn',        sd.conexiones || 0,     '10/sem', (sd.conexiones || 0) >= 10 ? '✓' : '✗'],
-    ['Freelance USD',              '$' + (sd.freelance || 0), '$50/sem', (sd.freelance || 0) >= 50 ? '✓' : '✗'],
-    ['Proyectos entregados',       sd.proyectos || 0,      '1/sem',  (sd.proyectos || 0) >= 1 ? '✓' : '—'],
-    ['Tarifa USD/hr efectiva',     '$' + (sd.tarifa || 0), '$8+',    (sd.tarifa || 0) >= 8 ? '✓' : '—'],
-    ['Posts LinkedIn (inglés)',    sd.posts || 0,          '2/sem',  (sd.posts || 0) >= 2 ? '✓' : '✗'],
-    ['GitHub commits',             sd.commits || 0,        '5/sem',  (sd.commits || 0) >= 5 ? '✓' : '—'],
-    ['Certificaciones publicadas', sd.certs || 0,          '0.5/sem', (sd.certs || 0) >= 1 ? '✓' : '—']
+    ['Postulaciones formales',    sd.postulaciones || 0,  '5/sem',  (sd.postulaciones || 0) >= 5 ? 'OK' : 'abajo'],
+    ['Entrevistas',                sd.entrevistas || 0,    '1/mes',  (sd.entrevistas || 0) >= 1 ? 'OK' : '—'],
+    ['Conexiones LinkedIn',        sd.conexiones || 0,     '10/sem', (sd.conexiones || 0) >= 10 ? 'OK' : 'abajo'],
+    ['Freelance USD',              '$' + (sd.freelance || 0), '$50/sem', (sd.freelance || 0) >= 50 ? 'OK' : 'abajo'],
+    ['Proyectos entregados',       sd.proyectos || 0,      '1/sem',  (sd.proyectos || 0) >= 1 ? 'OK' : '—'],
+    ['Tarifa USD/hr efectiva',     '$' + (sd.tarifa || 0), '$8+',    (sd.tarifa || 0) >= 8 ? 'OK' : '—'],
+    ['Posts LinkedIn (inglés)',    sd.posts || 0,          '2/sem',  (sd.posts || 0) >= 2 ? 'OK' : 'abajo'],
+    ['GitHub commits',             sd.commits || 0,        '5/sem',  (sd.commits || 0) >= 5 ? 'OK' : '—'],
+    ['Certificaciones publicadas', sd.certs || 0,          '0.5/sem', (sd.certs || 0) >= 1 ? 'OK' : '—']
   ];
   doc.autoTable({
     startY: y,
@@ -2188,9 +2345,9 @@ function generarPDF() {
     doc.text(lines, MARGIN, y);
     y += lines.length * 11 + 10;
   };
-  printText('🏆 Logros y aprendizajes:',  sd.reflexion, [56, 87, 35]);
-  printText('🤔 Preguntas para el coach:', sd.preguntas, [197, 80, 75]);
-  printText('📅 Plan próxima semana:',     sd.plan,      [31, 78, 121]);
+  printText('Logros y aprendizajes:',   sd.reflexion, [56, 87, 35]);
+  printText('Preguntas para el coach:', sd.preguntas, [197, 80, 75]);
+  printText('Plan próxima semana:',     sd.plan,      [31, 78, 121]);
 
   // Sección 4: Wins/Blockers diarios condensados
   if (y > 600) { doc.addPage(); y = MARGIN; }
@@ -2233,8 +2390,11 @@ function generarPDF() {
   doc.text(`• Certificaciones: ${certsDone}/${state.certs.length} completas`, MARGIN + 10, y); y += 12;
   doc.text(`• Repos GitHub: ${reposDone}/${state.repos.length} publicados`, MARGIN + 10, y); y += 12;
   doc.text(`• Libros: ${librosDone}/${state.libros.length} terminados${librosLeyendo ? ' · ' + librosLeyendo + ' leyendo' : ''}`, MARGIN + 10, y); y += 12;
-  doc.text(`• Inglés: ${state.idiomas.ingles}${state.idiomas.ielts ? ' (IELTS ' + state.idiomas.ielts + ')' : ''}`, MARGIN + 10, y); y += 12;
-  doc.text(`• Francés: ${state.idiomas.frances}${state.idiomas.tef ? ' (TEF ' + state.idiomas.tef + ')' : ''}`, MARGIN + 10, y); y += 18;
+  (Array.isArray(state.idiomas) ? state.idiomas : []).forEach(it => {
+    const ex = it.examen_nombre ? ` (${it.examen_nombre}${it.examen_score ? ' ' + it.examen_score : ''})` : '';
+    doc.text(`• ${it.nombre}: ${it.nivel || '—'}${ex}`, MARGIN + 10, y); y += 12;
+  });
+  y += 6;
 
   // Sección 6: REVISIÓN DEL COACH (en blanco)
   if (y > 540) { doc.addPage(); y = MARGIN; }
@@ -2246,11 +2406,11 @@ function generarPDF() {
   doc.text('Esta sección la llena el coach (Claude o mentor humano) cuando recibe el reporte. Si lo llena Claude, pídele que use el método Career Architect: directo, con tablas, sin motivación falsa.', MARGIN, y); y += 18;
 
   const coachSecciones = [
-    { t: '✅ Lo que destacó esta semana (lo bien hecho)', h: 60 },
-    { t: '🎯 Áreas a corregir (con honestidad)', h: 70 },
-    { t: '🛠️ Recomendaciones específicas para próxima semana', h: 90 },
-    { t: '⚠️ Riesgos detectados en el patrón de las últimas semanas', h: 60 },
-    { t: '📊 Ajustes propuestos al Plan Maestro (si aplica)', h: 60 }
+    { t: 'Lo que destacó esta semana (lo bien hecho)', h: 60 },
+    { t: 'Áreas a corregir (con honestidad)', h: 70 },
+    { t: 'Recomendaciones específicas para próxima semana', h: 90 },
+    { t: 'Riesgos detectados en el patrón de las últimas semanas', h: 60 },
+    { t: 'Ajustes propuestos al Plan Maestro (si aplica)', h: 60 }
   ];
   doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(60, 60, 60);
   coachSecciones.forEach(s => {
@@ -2298,7 +2458,7 @@ function generarPDFCompleto() {
     startY: y,
     head: [['Certificación', 'Meta', 'Estado', 'Fecha', 'URL Certificado']],
     body: state.certs.map(c => [
-      c.name, c.target, c.done ? '✓ Hecho' : '⏳ Pendiente',
+      c.name, c.target, c.done ? 'Hecho' : 'Pendiente',
       c.doneDate || '—', c.certUrl ? c.certUrl.substr(0, 40) + '...' : '—'
     ]),
     margin: { left: MARGIN, right: MARGIN },
@@ -2314,7 +2474,7 @@ function generarPDFCompleto() {
     startY: y,
     head: [['Repo', 'Meta', 'Estado', 'Fecha', 'URL GitHub']],
     body: state.repos.map(r => [
-      r.name, r.target, r.done ? '✓ Hecho' : '⏳ Pendiente',
+      r.name, r.target, r.done ? 'Hecho' : 'Pendiente',
       r.doneDate || '—', r.repoUrl ? r.repoUrl.substr(0, 40) + '...' : '—'
     ]),
     margin: { left: MARGIN, right: MARGIN },
@@ -2326,7 +2486,7 @@ function generarPDFCompleto() {
   if (y > 600) { doc.addPage(); y = MARGIN; }
   doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
   doc.text('BIBLIOTECA', MARGIN, y); y += 12;
-  const _estadoLabelPDF = { pendiente: '○ Pendiente', leyendo: '● Leyendo', pausado: '⏸ Pausado', terminado: '✓ Terminado', abandonado: '✕ Abandonado' };
+  const _estadoLabelPDF = { pendiente: 'Pendiente', leyendo: 'Leyendo', pausado: 'Pausado', terminado: 'Terminado', abandonado: 'Abandonado' };
   doc.autoTable({
     startY: y,
     head: [['#', 'Título', 'Autor', 'Estado', 'Progreso', 'Insight aplicado']],
@@ -2353,8 +2513,10 @@ function generarPDFCompleto() {
   doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
   doc.text('IDIOMAS', MARGIN, y); y += 14;
   doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
-  doc.text(`Inglés: ${state.idiomas.ingles}${state.idiomas.ielts ? '  ·  IELTS ' + state.idiomas.ielts : ''}`, MARGIN, y); y += 14;
-  doc.text(`Francés: ${state.idiomas.frances}${state.idiomas.tef ? '  ·  TEF ' + state.idiomas.tef : ''}`, MARGIN, y); y += 14;
+  (Array.isArray(state.idiomas) ? state.idiomas : []).forEach(it => {
+    const ex = it.examen_nombre ? `  ·  ${it.examen_nombre}${it.examen_score ? ' ' + it.examen_score : ''}` : '';
+    doc.text(`${it.nombre}: ${it.nivel || '—'}${ex}`, MARGIN, y); y += 14;
+  });
 
   doc.save('reporte_hitos_' + fechaHoy() + '.pdf');
   toast('Reporte completo generado');
