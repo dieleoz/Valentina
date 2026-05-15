@@ -512,17 +512,6 @@ const LIBROS_DEFAULT = [
   { id: 'atomic',    name: 'Atomic Habits · James Clear',                    orden: 5 }
 ];
 
-const STORAGE_KEY = 'tracker_valentina_v1';
-
-let state = {
-  dias: {},
-  semanas: {},
-  certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
-  repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
-  libros: LIBROS_DEFAULT.map(l => ({ ...l, started: false, finished: false, finishedDate: null })),
-  idiomas: { ingles: 'B2', frances: 'A0', ielts: '', tef: '' }
-};
-
 function defaultState() {
   return {
     dias: {},
@@ -533,6 +522,8 @@ function defaultState() {
     idiomas: { ingles: 'B2', frances: 'A0', ielts: '', tef: '' }
   };
 }
+
+let state = defaultState();
 
 async function cargarEstado() {
   try {
