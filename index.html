@@ -701,7 +701,7 @@ function categoriaTieneRegistros(id) {
 
 function nuevoIdCategoria(nombre) {
   let base = (nombre || 'cat').toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'cat';
   let id = base, n = 1;
   const existing = new Set((state.plan?.categorias || []).map(c => c.id));
@@ -1029,7 +1029,7 @@ function abrirMenuCategoria(ev, id) {
     <button ${puedeBajar ? '' : 'disabled'} onclick="moverCategoria('${id}',1);cerrarMenusAbiertos()">↓ Bajar</button>
     <hr>
     <button onclick="archivarCategoria('${id}');cerrarMenusAbiertos()">📦 Archivar (preserva histórico)</button>
-    <button class="danger" ${tieneRegistros ? 'disabled title="Tiene horas registradas — usá Archivar"' : ''} onclick="eliminarCategoria('${id}');cerrarMenusAbiertos()">🗑 Eliminar definitivo</button>
+    <button class="danger"${tieneRegistros ? ' disabled title="Tiene horas registradas — usá Archivar"' : ''} onclick="eliminarCategoria('${id}');cerrarMenusAbiertos()">🗑 Eliminar definitivo</button>
   `;
   document.body.appendChild(menu);
   const rect = ev.target.getBoundingClientRect();
