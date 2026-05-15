@@ -312,6 +312,114 @@
     border: 2px solid transparent;
   }
   .color-swatch.selected { border-color: #1A1A1A; }
+
+  /* Biblioteca */
+  .biblioteca-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 8px;
+  }
+  .biblioteca-header h2 { border-bottom: none; padding-bottom: 0; margin: 0; }
+  .biblioteca-header .btn { margin: 0; padding: 6px 12px; font-size: 13px; }
+  .chips-row {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin: 10px 0 14px;
+  }
+  .chip {
+    background: #F2F2F2;
+    border: 1px solid transparent;
+    color: #595959;
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .chip:hover { background: #E5E5E5; }
+  .chip.active {
+    background: #1F4E79; color: white;
+    border-color: #1F4E79;
+  }
+  .chip .count {
+    background: rgba(255,255,255,0.25);
+    border-radius: 8px; padding: 0 5px;
+    margin-left: 4px; font-size: 11px;
+  }
+  .chip:not(.active) .count {
+    background: #DDD; color: #404040;
+  }
+  .libro-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px; align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #EEE;
+  }
+  .libro-info { min-width: 0; }
+  .libro-titulo { font-weight: 600; font-size: 14px; color: #1A1A1A; }
+  .libro-autor { font-size: 12px; color: #595959; }
+  .libro-meta { font-size: 11px; color: #999; margin-top: 2px; }
+  .libro-estado-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+    white-space: nowrap;
+  }
+  .estado-pendiente   { background: #D9E2F3; color: #1F4E79; }
+  .estado-leyendo     { background: #FCE4D6; color: #C5504B; }
+  .estado-pausado     { background: #FFF2CC; color: #806000; }
+  .estado-terminado   { background: #D5E8C8; color: #385723; }
+  .estado-abandonado  { background: #E8E8E8; color: #595959; }
+  .libro-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+  .libro-actions .btn-mini {
+    background: transparent;
+    border: 1px solid #C0C0C0;
+    color: #1F4E79;
+    padding: 4px 9px;
+    border-radius: 4px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+  .libro-actions .btn-mini:hover { background: #F0F4FA; border-color: #1F4E79; }
+  .libro-actions .btn-mini.danger { color: #C5504B; }
+  .libro-actions .btn-mini.danger:hover { background: #FBEAE8; border-color: #C5504B; }
+  .libro-progress {
+    background: #EEE;
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+  .libro-progress > div {
+    background: #1F4E79;
+    height: 100%;
+  }
+  .libro-insight {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: #F5F5F5;
+    border-left: 3px solid #385723;
+    font-size: 13px; color: #404040;
+    border-radius: 0 4px 4px 0;
+  }
+  .libro-insight.warning {
+    background: #FFF2CC;
+    border-left-color: #E2A93B;
+    color: #806000;
+  }
+  .libro-insight.warning strong { color: #806000; }
+  .libro-insight .edit-link {
+    background: none; border: none;
+    color: #1F4E79; cursor: pointer;
+    font-weight: 600; font-size: 12px;
+    margin-left: 6px;
+    text-decoration: underline;
+  }
+  @media (max-width: 720px) {
+    .libro-row { grid-template-columns: 1fr; }
+    .libro-actions { justify-content: flex-start; }
+  }
 </style>
 </head>
 <body>
@@ -530,7 +638,12 @@
   </div>
 
   <div class="card">
-    <h2>📚 Libros del plan (de la guía de Career Architect)</h2>
+    <div class="biblioteca-header">
+      <h2>📚 Biblioteca</h2>
+      <button class="btn" onclick="agregarLibro()">＋ Agregar libro</button>
+    </div>
+    <div class="info-box">Cambiá el estado de cada libro mientras lo leés. <strong>Aplicado:</strong> dejá una nota corta de qué cambiaste/practicaste — un libro "terminado" sin nota se marca como "leído sin aplicar".</div>
+    <div id="biblioteca-filtros" class="chips-row"></div>
     <div id="lista-libros"></div>
   </div>
 </section>
@@ -596,6 +709,65 @@
 </section>
 
 </main>
+
+<!-- Modal agregar/editar libro -->
+<div class="modal-overlay" id="libro-modal" onclick="if(event.target===this)cerrarModalLibro()">
+  <div class="modal">
+    <h2 id="libro-modal-title">Nuevo libro</h2>
+    <input type="hidden" id="libro-modal-id" value="">
+    <div class="form-row">
+      <label>Título *</label>
+      <input type="text" id="libro-modal-titulo" placeholder="Ej: Atomic Habits" maxlength="120">
+    </div>
+    <div class="form-row">
+      <label>Autor</label>
+      <input type="text" id="libro-modal-autor" placeholder="Ej: James Clear" maxlength="80">
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Total de páginas</label>
+        <input type="number" id="libro-modal-paginas" min="0" step="1" placeholder="320">
+      </div>
+      <div class="form-row">
+        <label>Página actual</label>
+        <input type="number" id="libro-modal-pag-actual" min="0" step="1" value="0">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label>Estado</label>
+        <select id="libro-modal-estado">
+          <option value="pendiente">○ Pendiente</option>
+          <option value="leyendo">● Leyendo</option>
+          <option value="pausado">⏸ Pausado</option>
+          <option value="terminado">✓ Terminado</option>
+          <option value="abandonado">✕ Abandonado</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Horas totales</label>
+        <input type="number" id="libro-modal-horas" min="0" step="0.25" value="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>💡 Lo que apliqué (insight aplicado)</label>
+      <textarea id="libro-modal-insight" placeholder="Ej: implementé el hábito de 2 min — empecé con leer 1 página/día"></textarea>
+    </div>
+    <div class="form-row" id="libro-modal-rating-row">
+      <label>Rating (1–5)</label>
+      <input type="number" id="libro-modal-rating" min="1" max="5" step="1" placeholder="—">
+    </div>
+    <div class="form-row" id="libro-modal-motivo-row" style="display:none">
+      <label>Motivo de abandono</label>
+      <input type="text" id="libro-modal-motivo" placeholder="¿Por qué lo dejaste?" maxlength="200">
+    </div>
+    <div class="form-actions">
+      <button class="btn secondary" onclick="cerrarModalLibro()">Cancelar</button>
+      <button class="btn danger" id="libro-modal-borrar" style="margin-right:auto" onclick="borrarLibroDesdeModal()">🗑 Borrar</button>
+      <button class="btn success" onclick="guardarLibroModal()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal agregar/editar categoría -->
 <div class="modal-overlay" id="categoria-modal" onclick="if(event.target===this)cerrarModalCategoria()">
@@ -735,12 +907,70 @@ const REPOS_DEFAULT = [
 ];
 
 const LIBROS_DEFAULT = [
-  { id: 'mindset',   name: 'Mindset · Carol Dweck',                         orden: 1 },
-  { id: 'grit',      name: 'Grit · Angela Duckworth',                        orden: 2 },
-  { id: 'crucial',   name: 'Crucial Conversations · Patterson et al.',       orden: 3 },
-  { id: 'voss',      name: 'Never Split the Difference · Chris Voss',        orden: 4 },
-  { id: 'atomic',    name: 'Atomic Habits · James Clear',                    orden: 5 }
+  { id: 'mindset',  titulo: 'Mindset',                     autor: 'Carol Dweck',       paginas_total: 320, orden: 1 },
+  { id: 'grit',     titulo: 'Grit',                        autor: 'Angela Duckworth',  paginas_total: 352, orden: 2 },
+  { id: 'crucial',  titulo: 'Crucial Conversations',       autor: 'Patterson et al.',  paginas_total: 288, orden: 3 },
+  { id: 'voss',     titulo: 'Never Split the Difference',  autor: 'Chris Voss',        paginas_total: 288, orden: 4 },
+  { id: 'atomic',   titulo: 'Atomic Habits',               autor: 'James Clear',       paginas_total: 320, orden: 5 }
 ];
+
+const ESTADOS_LIBRO = ['pendiente', 'leyendo', 'pausado', 'terminado', 'abandonado'];
+const ESTADO_LIBRO_LABEL = {
+  pendiente:  '○ Pendiente',
+  leyendo:    '● Leyendo',
+  pausado:    '⏸ Pausado',
+  terminado:  '✓ Terminado',
+  abandonado: '✕ Abandonado'
+};
+
+function buildDefaultLibros() {
+  return LIBROS_DEFAULT.map(b => ({
+    id: b.id,
+    titulo: b.titulo,
+    autor: b.autor,
+    paginas_total: b.paginas_total,
+    en_plan_original: true,
+    estado: 'pendiente',
+    pagina_actual: 0,
+    inicio: null, fin: null,
+    motivo_abandono: null,
+    applied_insight: '',
+    horas_total: 0,
+    rating: null,
+    orden: b.orden
+  }));
+}
+
+function migrarLibro(l) {
+  if (l && l.estado) return l; // ya está en v2
+  let estado = 'pendiente';
+  if (l.finished) estado = 'terminado';
+  else if (l.started) estado = 'leyendo';
+  // Split del campo "name" viejo formato "Título · Autor"
+  let titulo = l.name || l.titulo || '', autor = l.autor || '';
+  if (!l.titulo && l.name) {
+    const parts = l.name.split(' · ');
+    if (parts.length >= 2) {
+      titulo = parts[0].trim();
+      autor = parts.slice(1).join(' · ').trim();
+    }
+  }
+  return {
+    id: l.id,
+    titulo, autor,
+    paginas_total: l.paginas_total ?? null,
+    en_plan_original: l.en_plan_original ?? true,
+    estado,
+    pagina_actual: l.pagina_actual ?? 0,
+    inicio: l.inicio ?? null,
+    fin: l.fin ?? l.finishedDate ?? null,
+    motivo_abandono: l.motivo_abandono ?? null,
+    applied_insight: l.applied_insight ?? '',
+    horas_total: l.horas_total ?? 0,
+    rating: l.rating ?? null,
+    orden: l.orden ?? 0
+  };
+}
 
 function defaultState() {
   return {
@@ -750,7 +980,7 @@ function defaultState() {
     plan: { categorias: buildDefaultCategorias() },
     certs: CERTS_DEFAULT.map(c => ({ ...c, done: false, doneDate: null, certUrl: '' })),
     repos: REPOS_DEFAULT.map(r => ({ ...r, done: false, doneDate: null, repoUrl: '' })),
-    libros: LIBROS_DEFAULT.map(l => ({ ...l, started: false, finished: false, finishedDate: null })),
+    libros: buildDefaultLibros(),
     idiomas: { ingles: 'B2', frances: 'A0', ielts: '', tef: '' }
   };
 }
@@ -768,7 +998,12 @@ async function cargarEstado() {
         s.semanas = s.semanas || {};
         s.certs = s.certs || state.certs;
         s.repos = s.repos || state.repos;
-        s.libros = s.libros || state.libros;
+        // Migrar libros v1 → v2 (estado, applied_insight, etc.)
+        if (!Array.isArray(s.libros) || s.libros.length === 0) {
+          s.libros = state.libros;
+        } else {
+          s.libros = s.libros.map(migrarLibro);
+        }
         s.idiomas = s.idiomas || state.idiomas;
         // Migración v1 → v2: si no hay plan.categorias, generarlas desde defaults.
         // Los registros diarios viejos (state.dias[...].bloques.ingles, .tech, etc.)
@@ -1104,6 +1339,357 @@ function moverCategoria(id, direction) {
   guardar();
 }
 
+// ============= BIBLIOTECA (LIBROS) =============
+let _filtroLibros = 'todos';
+
+function getLibroById(id) {
+  return state.libros?.find(l => l.id === id) || null;
+}
+
+function getEstadosLibrosCount() {
+  const counts = { todos: 0, pendiente: 0, leyendo: 0, pausado: 0, terminado: 0, abandonado: 0 };
+  (state.libros || []).forEach(l => {
+    counts.todos++;
+    if (counts[l.estado] !== undefined) counts[l.estado]++;
+  });
+  return counts;
+}
+
+function renderBiblioteca() {
+  const lc = document.getElementById('lista-libros');
+  const fc = document.getElementById('biblioteca-filtros');
+  if (!lc || !fc) return;
+  const counts = getEstadosLibrosCount();
+  const filtros = [
+    ['todos', 'Todos'],
+    ['leyendo', '● Leyendo'],
+    ['pendiente', '○ Pendientes'],
+    ['pausado', '⏸ Pausados'],
+    ['terminado', '✓ Terminados'],
+    ['abandonado', '✕ Abandonados']
+  ];
+  fc.innerHTML = filtros.map(([key, label]) => `
+    <span class="chip ${_filtroLibros === key ? 'active' : ''}" onclick="setFiltroLibros('${key}')">
+      ${label}<span class="count">${counts[key] || 0}</span>
+    </span>
+  `).join('');
+
+  const libros = (state.libros || [])
+    .filter(l => _filtroLibros === 'todos' || l.estado === _filtroLibros)
+    .sort((a, b) => {
+      // primero los leyendo, luego por orden
+      const rank = { leyendo: 0, pendiente: 1, pausado: 2, terminado: 3, abandonado: 4 };
+      const ra = rank[a.estado] ?? 5, rb = rank[b.estado] ?? 5;
+      if (ra !== rb) return ra - rb;
+      return (a.orden ?? 0) - (b.orden ?? 0);
+    });
+
+  if (libros.length === 0) {
+    lc.innerHTML = `<div class="small" style="padding:14px 0">Sin libros en este filtro.</div>`;
+    return;
+  }
+
+  lc.innerHTML = libros.map(l => renderLibroRow(l)).join('');
+}
+
+function renderLibroRow(l) {
+  const pct = (l.paginas_total && l.paginas_total > 0)
+    ? Math.min(100, Math.round((l.pagina_actual || 0) / l.paginas_total * 100))
+    : null;
+  const meta = [];
+  if (pct !== null) meta.push(`${l.pagina_actual || 0}/${l.paginas_total} pp · ${pct}%`);
+  else if (l.pagina_actual) meta.push(`pág ${l.pagina_actual}`);
+  if (l.horas_total > 0) meta.push(`${l.horas_total}h`);
+  if (l.fin && l.estado === 'terminado') meta.push(`leído ${l.fin}`);
+  if (l.inicio && l.estado === 'leyendo') meta.push(`desde ${l.inicio}`);
+  if (l.estado === 'abandonado' && l.motivo_abandono) meta.push(`"${escapeHtml(l.motivo_abandono)}"`);
+  if (!l.en_plan_original) meta.push('fuera de plan');
+
+  const acciones = renderAccionesLibro(l);
+  const insightBlock = renderInsightBlock(l);
+
+  return `
+    <div class="libro-row" data-libro-id="${l.id}">
+      <div class="libro-info">
+        <div class="libro-titulo">${escapeHtml(l.titulo)}</div>
+        <div class="libro-autor">${escapeHtml(l.autor || '—')}</div>
+        ${meta.length > 0 ? `<div class="libro-meta">${meta.join(' · ')}</div>` : ''}
+        ${pct !== null && l.estado === 'leyendo' ? `<div class="libro-progress"><div style="width:${pct}%"></div></div>` : ''}
+      </div>
+      <span class="libro-estado-badge estado-${l.estado}">${ESTADO_LIBRO_LABEL[l.estado] || l.estado}</span>
+      <div class="libro-actions">${acciones}</div>
+      ${insightBlock}
+    </div>
+  `;
+}
+
+function renderAccionesLibro(l) {
+  const id = l.id;
+  const editBtn = `<button class="btn-mini" title="Editar" onclick="editarLibro('${id}')">✎</button>`;
+  switch (l.estado) {
+    case 'pendiente':
+      return `
+        <button class="btn-mini" onclick="empezarLibro('${id}')">▶ Empezar</button>
+        ${editBtn}`;
+    case 'leyendo':
+      return `
+        <button class="btn-mini" onclick="avanzarLibro('${id}')">＋ Avance</button>
+        <button class="btn-mini" onclick="pausarLibro('${id}')">⏸ Pausar</button>
+        <button class="btn-mini" onclick="terminarLibro('${id}')">✓ Terminar</button>
+        ${editBtn}`;
+    case 'pausado':
+      return `
+        <button class="btn-mini" onclick="reanudarLibro('${id}')">▶ Reanudar</button>
+        <button class="btn-mini danger" onclick="abandonarLibro('${id}')">✕ Abandonar</button>
+        ${editBtn}`;
+    case 'terminado':
+      return `
+        <button class="btn-mini" onclick="editarInsightLibro('${id}')">💡 Insight</button>
+        ${editBtn}`;
+    case 'abandonado':
+      return `
+        <button class="btn-mini" onclick="reabrirLibro('${id}')">↻ Reabrir</button>
+        ${editBtn}`;
+    default:
+      return editBtn;
+  }
+}
+
+function renderInsightBlock(l) {
+  if (l.estado === 'pendiente' || l.estado === 'leyendo' || l.estado === 'pausado') return '';
+  const insight = (l.applied_insight || '').trim();
+  if (l.estado === 'terminado' && !insight) {
+    return `<div class="libro-insight warning"><strong>⚠️ Leído sin applied_insight.</strong> Anotá lo que cambiaste/aplicaste — si no, fue lectura de consumo. <button class="edit-link" onclick="editarInsightLibro('${l.id}')">Agregar insight</button></div>`;
+  }
+  if (insight) {
+    return `<div class="libro-insight">💡 <strong>Lo que aplicó:</strong> ${escapeHtml(insight)} <button class="edit-link" onclick="editarInsightLibro('${l.id}')">editar</button></div>`;
+  }
+  return '';
+}
+
+function setFiltroLibros(key) {
+  _filtroLibros = key;
+  renderBiblioteca();
+}
+
+// CRUD libros
+let _modalLibroId = null;
+
+function agregarLibro() { abrirModalLibro(null); }
+function editarLibro(id) { abrirModalLibro(id); }
+
+function editarInsightLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  const txt = prompt('Lo que apliqué del libro "' + l.titulo + '":', l.applied_insight || '');
+  if (txt === null) return;
+  l.applied_insight = txt.trim();
+  renderBiblioteca();
+  guardar();
+  toast('Insight guardado');
+}
+
+function abrirModalLibro(id) {
+  _modalLibroId = id;
+  const l = id ? getLibroById(id) : null;
+  document.getElementById('libro-modal-title').textContent = l ? 'Editar libro' : 'Nuevo libro';
+  document.getElementById('libro-modal-id').value = id || '';
+  document.getElementById('libro-modal-titulo').value = l?.titulo || '';
+  document.getElementById('libro-modal-autor').value = l?.autor || '';
+  document.getElementById('libro-modal-paginas').value = l?.paginas_total ?? '';
+  document.getElementById('libro-modal-pag-actual').value = l?.pagina_actual ?? 0;
+  document.getElementById('libro-modal-estado').value = l?.estado || 'pendiente';
+  document.getElementById('libro-modal-horas').value = l?.horas_total ?? 0;
+  document.getElementById('libro-modal-insight').value = l?.applied_insight || '';
+  document.getElementById('libro-modal-rating').value = l?.rating ?? '';
+  document.getElementById('libro-modal-motivo').value = l?.motivo_abandono || '';
+  toggleMotivoVisible();
+  document.getElementById('libro-modal-borrar').style.display = (l && !l.en_plan_original) ? '' : 'none';
+  document.getElementById('libro-modal').classList.add('show');
+  setTimeout(() => document.getElementById('libro-modal-titulo').focus(), 50);
+}
+
+function toggleMotivoVisible() {
+  const estado = document.getElementById('libro-modal-estado').value;
+  document.getElementById('libro-modal-motivo-row').style.display = (estado === 'abandonado') ? '' : 'none';
+}
+
+function cerrarModalLibro() {
+  document.getElementById('libro-modal').classList.remove('show');
+  _modalLibroId = null;
+}
+
+function guardarLibroModal() {
+  const titulo = document.getElementById('libro-modal-titulo').value.trim();
+  if (!titulo) { toast('El título es obligatorio', false); return; }
+  const autor = document.getElementById('libro-modal-autor').value.trim();
+  const paginasRaw = document.getElementById('libro-modal-paginas').value;
+  const paginas_total = paginasRaw === '' ? null : Math.max(0, parseInt(paginasRaw, 10) || 0);
+  const pagina_actual = Math.max(0, parseInt(document.getElementById('libro-modal-pag-actual').value, 10) || 0);
+  const estado = document.getElementById('libro-modal-estado').value;
+  const horas_total = Math.max(0, parseFloat(document.getElementById('libro-modal-horas').value) || 0);
+  const applied_insight = document.getElementById('libro-modal-insight').value.trim();
+  const ratingRaw = document.getElementById('libro-modal-rating').value;
+  const rating = ratingRaw === '' ? null : Math.max(1, Math.min(5, parseInt(ratingRaw, 10) || 0));
+  const motivo_abandono = document.getElementById('libro-modal-motivo').value.trim() || null;
+
+  if (!Array.isArray(state.libros)) state.libros = [];
+
+  if (_modalLibroId) {
+    const l = getLibroById(_modalLibroId);
+    if (l) {
+      const estadoPrev = l.estado;
+      l.titulo = titulo;
+      l.autor = autor;
+      l.paginas_total = paginas_total;
+      l.pagina_actual = pagina_actual;
+      l.estado = estado;
+      l.horas_total = horas_total;
+      l.applied_insight = applied_insight;
+      l.rating = rating;
+      l.motivo_abandono = (estado === 'abandonado') ? motivo_abandono : null;
+      // Si pasó a leyendo y no tiene inicio, marcarlo
+      if (estado === 'leyendo' && !l.inicio) l.inicio = fechaHoy();
+      if (estado === 'terminado' && !l.fin) l.fin = fechaHoy();
+      if (estado !== 'terminado' && estadoPrev === 'terminado') l.fin = null;
+    }
+  } else {
+    const orden = Math.max(0, ...(state.libros.map(b => b.orden ?? 0))) + 1;
+    const id = nuevoIdLibro(titulo);
+    state.libros.push({
+      id, titulo, autor,
+      paginas_total,
+      en_plan_original: false,
+      estado, pagina_actual,
+      inicio: (estado === 'leyendo' || estado === 'terminado') ? fechaHoy() : null,
+      fin: (estado === 'terminado') ? fechaHoy() : null,
+      motivo_abandono: (estado === 'abandonado') ? motivo_abandono : null,
+      applied_insight,
+      horas_total, rating,
+      orden
+    });
+  }
+  cerrarModalLibro();
+  renderBiblioteca();
+  guardar();
+  toast(_modalLibroId ? 'Libro actualizado' : 'Libro agregado');
+}
+
+function nuevoIdLibro(titulo) {
+  let base = (titulo || 'libro').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'libro';
+  let id = base, n = 1;
+  const existing = new Set((state.libros || []).map(l => l.id));
+  while (existing.has(id)) { id = base + '-' + (++n); }
+  return id;
+}
+
+function borrarLibroDesdeModal() {
+  const id = _modalLibroId;
+  if (!id) return;
+  const l = getLibroById(id);
+  if (!l) return;
+  if (l.en_plan_original) { toast('No se pueden borrar libros del plan original — usá Abandonar', false); return; }
+  if (!confirm('¿Borrar "' + l.titulo + '" definitivamente?')) return;
+  state.libros = state.libros.filter(x => x.id !== id);
+  cerrarModalLibro();
+  renderBiblioteca();
+  guardar();
+  toast('Libro borrado');
+}
+
+// Acciones de estado rápidas
+function empezarLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  l.estado = 'leyendo';
+  if (!l.inicio) l.inicio = fechaHoy();
+  renderBiblioteca();
+  guardar();
+}
+
+function pausarLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  l.estado = 'pausado';
+  renderBiblioteca();
+  guardar();
+}
+
+function reanudarLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  l.estado = 'leyendo';
+  if (!l.inicio) l.inicio = fechaHoy();
+  renderBiblioteca();
+  guardar();
+}
+
+function terminarLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  l.estado = 'terminado';
+  l.fin = fechaHoy();
+  if (l.paginas_total && l.pagina_actual < l.paginas_total) l.pagina_actual = l.paginas_total;
+  renderBiblioteca();
+  guardar();
+  if (!l.applied_insight) toast('Marcado terminado — agregá el insight aplicado para no quedar como "vanity reading"', false);
+  else toast('"' + l.titulo + '" terminado 🎉');
+}
+
+function abandonarLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  const motivo = prompt('Motivo de abandono (1 línea):', l.motivo_abandono || '');
+  if (motivo === null) return;
+  l.estado = 'abandonado';
+  l.motivo_abandono = motivo.trim() || null;
+  l.fin = fechaHoy();
+  renderBiblioteca();
+  guardar();
+  toast('"' + l.titulo + '" abandonado');
+}
+
+function reabrirLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  l.estado = (l.pagina_actual > 0) ? 'leyendo' : 'pendiente';
+  l.motivo_abandono = null;
+  l.fin = null;
+  if (l.estado === 'leyendo' && !l.inicio) l.inicio = fechaHoy();
+  renderBiblioteca();
+  guardar();
+}
+
+function avanzarLibro(id) {
+  const l = getLibroById(id);
+  if (!l) return;
+  const total = l.paginas_total;
+  const promptLabel = total
+    ? `Página actual (de ${total}):`
+    : 'Página actual:';
+  const raw = prompt(promptLabel, l.pagina_actual || 0);
+  if (raw === null) return;
+  const v = Math.max(0, parseInt(raw, 10) || 0);
+  l.pagina_actual = total ? Math.min(v, total) : v;
+  // Si llegó al final, sugerir marcar terminado
+  if (total && l.pagina_actual >= total) {
+    if (confirm('Llegaste a la última página. ¿Marcar como Terminado?')) {
+      l.estado = 'terminado';
+      l.fin = fechaHoy();
+    }
+  }
+  renderBiblioteca();
+  guardar();
+}
+
+// Inicializar listener del select de estado en el modal cuando carga
+document.addEventListener('DOMContentLoaded', () => {
+  const estadoSelect = document.getElementById('libro-modal-estado');
+  if (estadoSelect) estadoSelect.addEventListener('change', toggleMotivoVisible);
+});
+
 function cargarDia(fecha) {
   document.getElementById('hoy-fecha').value = fecha;
   const data = state.dias[fecha];
@@ -1329,36 +1915,8 @@ function renderHitos() {
     });
   });
 
-  // Libros
-  const lc = document.getElementById('lista-libros');
-  lc.innerHTML = '';
-  state.libros.forEach((l, i) => {
-    const div = document.createElement('div');
-    div.className = 'milestone-item' + (l.finished ? ' done' : '');
-    div.innerHTML = `
-      <input type="checkbox" data-libro-i="${i}" ${l.finished ? 'checked' : ''}>
-      <div class="name"><strong>#${l.orden} · ${l.name}</strong></div>
-      <span class="badge ${l.started && !l.finished ? 'badge-orange' : (l.finished ? 'badge-green' : 'badge-blue')}">
-        ${l.finished ? 'Terminado' : (l.started ? 'En curso' : 'Pendiente')}
-      </span>
-      <span></span>
-    `;
-    lc.appendChild(div);
-  });
-  lc.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', e => {
-      const i = +e.target.dataset.libroI;
-      if (e.target.checked) {
-        state.libros[i].finished = true;
-        state.libros[i].finishedDate = fechaHoy();
-      } else {
-        state.libros[i].finished = false;
-        state.libros[i].finishedDate = null;
-      }
-      state.libros[i].started = true;
-      guardar(); renderHitos();
-    });
-  });
+  // Libros — render delegado a renderBiblioteca (estados, applied_insight, filtros)
+  renderBiblioteca();
 
   // Idiomas
   document.getElementById('ingles-nivel').value = state.idiomas.ingles;
@@ -1447,14 +2005,16 @@ function actualizarStorageInfo() {
   const semanas = Object.keys(state.semanas).length;
   const certsDone = state.certs.filter(c => c.done).length;
   const reposDone = state.repos.filter(r => r.done).length;
-  const librosDone = state.libros.filter(l => l.finished).length;
+  const librosDone = state.libros.filter(l => l.estado === 'terminado').length;
+  const librosLeyendo = state.libros.filter(l => l.estado === 'leyendo').length;
+  const librosSinInsight = state.libros.filter(l => l.estado === 'terminado' && !(l.applied_insight || '').trim()).length;
   document.getElementById('storage-info').innerHTML = `
     <table>
       <tr><td><strong>Días registrados</strong></td><td>${dias}</td></tr>
       <tr><td><strong>Semanas con KPIs</strong></td><td>${semanas}</td></tr>
       <tr><td><strong>Certificaciones completas</strong></td><td>${certsDone}/${state.certs.length}</td></tr>
       <tr><td><strong>Repos GitHub completos</strong></td><td>${reposDone}/${state.repos.length}</td></tr>
-      <tr><td><strong>Libros leídos</strong></td><td>${librosDone}/${state.libros.length}</td></tr>
+      <tr><td><strong>Libros terminados</strong></td><td>${librosDone}/${state.libros.length}${librosLeyendo ? ` · ${librosLeyendo} leyendo` : ''}${librosSinInsight ? ` · ⚠️ ${librosSinInsight} sin insight` : ''}</td></tr>
       <tr><td><strong>Tamaño en navegador</strong></td><td>${sizeKB} KB</td></tr>
     </table>
   `;
@@ -1617,11 +2177,12 @@ function generarPDF() {
 
   const certsDone = state.certs.filter(c => c.done).length;
   const reposDone = state.repos.filter(r => r.done).length;
-  const librosDone = state.libros.filter(l => l.finished).length;
+  const librosDone = state.libros.filter(l => l.estado === 'terminado').length;
+  const librosLeyendo = state.libros.filter(l => l.estado === 'leyendo').length;
   doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
   doc.text(`• Certificaciones: ${certsDone}/${state.certs.length} completas`, MARGIN + 10, y); y += 12;
   doc.text(`• Repos GitHub: ${reposDone}/${state.repos.length} publicados`, MARGIN + 10, y); y += 12;
-  doc.text(`• Libros del plan: ${librosDone}/${state.libros.length} terminados`, MARGIN + 10, y); y += 12;
+  doc.text(`• Libros: ${librosDone}/${state.libros.length} terminados${librosLeyendo ? ' · ' + librosLeyendo + ' leyendo' : ''}`, MARGIN + 10, y); y += 12;
   doc.text(`• Inglés: ${state.idiomas.ingles}${state.idiomas.ielts ? ' (IELTS ' + state.idiomas.ielts + ')' : ''}`, MARGIN + 10, y); y += 12;
   doc.text(`• Francés: ${state.idiomas.frances}${state.idiomas.tef ? ' (TEF ' + state.idiomas.tef + ')' : ''}`, MARGIN + 10, y); y += 18;
 
@@ -1714,18 +2275,27 @@ function generarPDFCompleto() {
 
   if (y > 600) { doc.addPage(); y = MARGIN; }
   doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(31, 78, 121);
-  doc.text('LIBROS DEL PLAN', MARGIN, y); y += 12;
+  doc.text('BIBLIOTECA', MARGIN, y); y += 12;
+  const _estadoLabelPDF = { pendiente: '○ Pendiente', leyendo: '● Leyendo', pausado: '⏸ Pausado', terminado: '✓ Terminado', abandonado: '✕ Abandonado' };
   doc.autoTable({
     startY: y,
-    head: [['#', 'Libro', 'Estado', 'Fecha terminado']],
-    body: state.libros.map(l => [
-      l.orden, l.name,
-      l.finished ? '✓ Terminado' : (l.started ? 'En curso' : 'Pendiente'),
-      l.finishedDate || '—'
-    ]),
+    head: [['#', 'Título', 'Autor', 'Estado', 'Progreso', 'Insight aplicado']],
+    body: state.libros.map(l => {
+      const insight = (l.applied_insight || '').trim();
+      const insightCell = (l.estado === 'terminado' && !insight) ? '⚠️ leído sin aplicar' : (insight || '—');
+      let progreso = '—';
+      if (l.paginas_total && l.pagina_actual !== undefined) {
+        const pct = Math.min(100, Math.round((l.pagina_actual || 0) / l.paginas_total * 100));
+        progreso = `${l.pagina_actual || 0}/${l.paginas_total} (${pct}%)`;
+      } else if (l.pagina_actual) {
+        progreso = `pág ${l.pagina_actual}`;
+      }
+      return [l.orden, l.titulo, l.autor || '—', _estadoLabelPDF[l.estado] || l.estado, progreso, insightCell];
+    }),
     margin: { left: MARGIN, right: MARGIN },
-    styles: { fontSize: 9, cellPadding: 5 },
-    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' }
+    styles: { fontSize: 8, cellPadding: 4 },
+    headStyles: { fillColor: [217, 226, 243], textColor: [31, 78, 121], fontStyle: 'bold' },
+    columnStyles: { 0: { cellWidth: 22 }, 5: { cellWidth: 160 } }
   });
   y = doc.lastAutoTable.finalY + 16;
 
